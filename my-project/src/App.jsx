@@ -12,7 +12,32 @@ import Purchase from "./components/purchase";
 
 function App() {
   return (
-    <Login></Login>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        
+        {/* Admin Section */}
+        <Route path="/admin" element={<Admin />}>
+          <Route index element={<Stock />} />
+          <Route path="stock" element={<Stock />} />
+          <Route path="adduser" element={<Adduser />} />
+          <Route path="billing" element={<Billing />} />
+          <Route path="criticalstock" element={<CriticalStock />} />
+          <Route path="purchase" element={<Purchase />} />
+          <Route path="suppliers" element={<Suppliers />} />
+        </Route>
+
+        {/* Billdesk Section */}
+        <Route path="/billdesk" element={<Billdesk />}>
+          <Route index element={<Billing />} />
+          <Route path="stock" element={<Stock />} />
+          <Route path="billing" element={<Billing />} />
+          <Route path="criticalstock" element={<CriticalStock />} />
+          <Route path="purchase" element={<Purchase />} />
+        </Route>
+
+      </Routes>
+    </Router>
   );
 }
 
