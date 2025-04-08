@@ -1,0 +1,219 @@
+/* Base layout */
+/* Base layout */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f6f8;
+  color: #2c3e50;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center; /* Horizontally center content */
+  overflow-x: hidden;
+}
+
+  
+  /* Container and layout */
+/* Container and layout */
+/* Container and layout */
+.container,
+.form-container{
+  padding: 20px;
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center items inside */
+}
+
+  /* Section title */
+  .title {
+    text-align: center;
+    font-size: 26px;
+    color: #2c3e50; /* Dark blue-gray */
+    margin-bottom: 20px;
+  }
+  
+  /* Input Fields */
+  .horizontal-form input,
+  .horizontal-form select,
+  .form input,
+  .form select,
+  .filter-form input,
+  .filter-form select {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    width: 220px;
+    box-sizing: border-box;
+    background-color: #ffffff; /* White input */
+    color: #2c3e50; /* Dark input text */
+    transition: all 0.2s ease-in-out;
+    
+  }
+  
+  .filter-form input,
+  .filter-form select {
+    width: 200px;
+  }
+  
+  /* Focus effect */
+  .horizontal-form input:focus,
+  .horizontal-form select:focus,
+  .form input:focus,
+  .form select:focus,
+  .filter-form input:focus,
+  .filter-form select:focus {
+    outline: none;
+    border-color: #3498db;
+    background-color: #f0faff; /* Light blue tint */
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+  }
+  
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #ffffff; /* White card */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  th, td {
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 1px solid #eee;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal; /* Allow wrapping */
+  }
+  
+  
+  th {
+    background-color: #f0f4f7;
+    font-weight: 600;
+    color: #555;
+  }
+  
+  td {
+    color: #444;
+  }
+  
+  /* Buttons */
+  .save-btn,
+  .delete-btn,
+  .edit-btn,
+  .cancel-btn {
+    padding: 6px 12px;
+    font-size: 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-right: 5px;
+  }
+  
+  .save-btn {
+    background-color: #27ae60; /* Green */
+    color: white;
+  }
+  
+  .delete-btn {
+    background-color: #e74c3c; /* Red */
+    color: white;
+  }
+  
+  .edit-btn {
+    background-color: #f39c12; /* Orange */
+    color: white;
+  }
+  
+  .cancel-btn {
+    background-color: #95a5a6; /* Gray */
+    color: white;
+  }
+  
+  .save-btn:hover { background-color: #219150; }
+  .delete-btn:hover { background-color: #c0392b; }
+  .edit-btn:hover { background-color: #e67e22; }
+  .cancel-btn:hover { background-color: #7f8c8d; }
+  
+  /* No results row */
+  .no-stock,
+  .no-records {
+    text-align: center;
+    font-style: italic;
+    color: #888;
+    padding: 20px 0;
+    font-size: 16px;
+  }
+  
+  /* Filters */
+  .filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .filter-form input,
+  .filter-form select {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    width: 200px;
+    background-color: #ffffff;
+    color: #2c3e50;
+  }
+  .critical {
+    background-color: #ffe5e5;
+    color: #d8000c;
+    font-weight: bold;
+  }
+  
+  .warning {
+    background-color: #fff9e5;
+    color: #9f6000;
+  }
+  
+  .table-container {
+    overflow-x: auto;
+  }
+  
+  .no-records {
+    text-align: center;
+    font-style: italic;
+    padding: 12px;
+  }
+  .table-container {
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: 500px;
+    width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  
+    /* Hide scrollbars but allow scrolling */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* Internet Explorer and Edge */
+  }
+  
+  .table-container::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+  /* Set consistent column width and fixed layout for stock table */
+table.table-1 {
+  table-layout: fixed;
+  width: 100%;
+}
+
+/* Set equal width for each of the 5 columns */
+table.table-1 th,
+table.table-1 td {
+  width: 20%; /* 100% / 5 columns = 20% each */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+}

@@ -1,198 +1,192 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import jsPDF from "jspdf";
-import "jspdf-autotable";
-import "../styles/Billing.css";
+import "../styles/styles.css";
 
 const Billing = () => {
-    const [stocks, setStocks] = useState([]);
-    const [filteredStocks, setFilteredStocks] = useState([]);
-    const [selectedItems, setSelectedItems] = useState([]);
-    const [searchTerm, setSearchTerm] = useState("");
+  const [stockData, setStockData] = useState([]);
+  const [selectedItem, setSelectedItem] = useState("");
+  const [formData, setFormData] = useState({
+    name: "",
+    quantity: "",
+    price: "",
+    totalPrice: 0,
+  });
+  const [billingDetails, setBillingDetails] = useState([]);
 
-    useEffect(() => {
-        fetchStocks();
-    }, []);
+  useEffect(() => {
+    axios.get("http://localhost:5000/stock")
+      .then((res) => setStockData(res.data))
+      .catch((err) => console.error(err));
 
-    const fetchStocks = async () => {
-        try {
-            const response = await axios.get("http://localhost:5000/stock");
-            setStocks(response.data);
-            setFilteredStocks(response.data);
-        } catch (error) {
-            console.error("Error fetching stocks:", error);
-        }
-    };
+    axios.get("http://localhost:5000/billing")
+      .then((res) => setBillingDetails(res.data))
+      .catch((err) => console.error(err));
+  }, []);
 
-    const handleSearch = (event) => {
-        const term = event.target.value.toLowerCase();
-        setSearchTerm(term);
-        setFilteredStocks(
-            term === "" ? stocks : stocks.filter(stock => stock.name.toLowerCase().includes(term))
-        );
-    };
+  const handleItemChange = (e) => {
+    const name = e.target.value;
+    setSelectedItem(name);
+    const item = stockData.find((item) => item.name === name);
 
-    const handleSelectItem = (stock) => {
-        if (!selectedItems.some(item => item._id === stock._id)) {
-            setSelectedItems([...selectedItems, { ...stock, quantityToBuy: 1 }]);
-        }
-    };
+    if (item) {
+      setFormData({
+        name: item.name,
+        quantity: "",
+        price: "",
+        totalPrice: 0,
+      });
+    }
+  };
 
-    const handleQuantityChange = (id, quantity) => {
-        setSelectedItems(selectedItems.map(item =>
-            item._id === id ? { ...item, quantityToBuy: Math.min(quantity, item.quantity) } : item
-        ));
-    };
+  const handleQuantityChange = (e) => {
+    const quantity = parseInt(e.target.value) || 0;
+    setFormData((prev) => ({
+      ...prev,
+      quantity,
+      totalPrice: prev.price * quantity,
+    }));
+  };
 
-    const generateBill = async () => {
-        if (selectedItems.length === 0) {
-            alert("No items selected!");
-            return;
-        }
+  const handlePriceChange = (e) => {
+    const price = parseFloat(e.target.value) || 0;
+    setFormData((prev) => ({
+      ...prev,
+      price,
+      totalPrice: price * prev.quantity,
+    }));
+  };
 
-        try {
-            for (const item of selectedItems) {
-                await axios.put(`http://localhost:5000/stock/${item._id}`, {
-                    quantity: item.quantity - item.quantityToBuy
-                });
-            }
+  const handleGenerateBill = () => {
+    const item = stockData.find((item) => item.name === formData.name);
 
-            fetchStocks();
-            generatePDF(selectedItems);
-            setSelectedItems([]);
-        } catch (error) {
-            console.error("Error updating stock:", error);
-            alert("Failed to update stock. Try again!");
-        }
-    };
+    if (item && item.quantity >= formData.quantity) {
+      const updatedQuantity = item.quantity - formData.quantity;
 
-    const generatePDF = (billItems) => {
-        if (billItems.length === 0) {
-            console.warn("No items selected for billing!");
-            return;
-        }
+      axios.put(`http://localhost:5000/stock/${item._id}`, {
+        quantity: updatedQuantity,
+      }).then(() => {
+        const currentDate = new Date().toISOString().split('T')[0];
 
-        const doc = new jsPDF();
-        doc.setFontSize(18);
-        doc.text("🧾 KPS Silks Bill Summary", 10, 15);
-
-        const tableData = billItems.map((item, index) => [
-            index + 1,
-            item.name,
-            item.quantityToBuy,
-            `₹${item.pricePerUnit.toFixed(2)}`,
-            `₹${(item.quantityToBuy * item.pricePerUnit).toFixed(2)}`
-        ]);
-
-        doc.autoTable({
-            head: [["#", "Item", "Quantity", "Price", "Total"]],
-            body: tableData,
-            startY: 25
+        axios.post("http://localhost:5000/billing", {
+          name: formData.name,
+          quantity: formData.quantity,
+          price: formData.price,
+          totalPrice: formData.totalPrice,
+          date: currentDate,
+        }).then((response) => {
+          setBillingDetails((prev) => [...prev, response.data]);
+          setSelectedItem("");
+          setFormData({
+            name: "",
+            quantity: "",
+            price: "",
+            totalPrice: 0,
+          });
+        }).catch((err) => {
+          console.error("Error saving the bill:", err);
         });
+      }).catch((err) => {
+        console.error("Error updating stock:", err);
+      });
+    } else {
+      alert("Not enough stock available!");
+    }
+  };
 
-        const total = billItems.reduce((sum, item) => sum + (item.quantityToBuy * item.pricePerUnit), 0).toFixed(2);
-        doc.text(`Total Amount: ₹${total}`, 10, doc.autoTable.previous.finalY + 10);
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = String(date.getFullYear()).slice(-2);
+    return `${day}-${month}-${year}`;
+  };
 
-        // Convert to Blob and open in a new tab
-        const pdfBlob = doc.output("blob");
-        const pdfUrl = URL.createObjectURL(pdfBlob);
-        const newWindow = window.open(pdfUrl, "_blank");
+  return (
+    <div className="container">
+      <h2 className="title">Billing</h2>
 
-        if (!newWindow) {
-            alert("⚠️ Pop-up blocked! Please allow pop-ups for this site.");
-        }
+      <form className="form">
+        <div className="filter-form">
+          <div className="input-group">
+            <label>Item</label>
+            <select value={selectedItem} onChange={handleItemChange}>
+              <option value="">Select item</option>
+              {stockData.map((item) => (
+                <option key={item._id} value={item.name}>
+                  {item.name}
+                </option>
+              ))}
+            </select>
+          </div>
 
-        setTimeout(() => URL.revokeObjectURL(pdfUrl), 5000);
-    };
-
-    return (
-        <div className="billing-container">
-            <h2 className="text-5xl font-carattere">🛒 Billing System</h2>
-
+          <div className="input-group">
+            <label>Quantity</label>
             <input
-                type="text"
-                placeholder="Search for a stock..."
-                value={searchTerm}
-                onChange={handleSearch}
-                className="search-input"
+              type="number"
+              value={formData.quantity}
+              onChange={handleQuantityChange}
+              placeholder="Quantity"
             />
+          </div>
 
-            {filteredStocks.length > 0 ? (
-                <div className="stock-list">
-                    <h3>Select Items</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Category</th>
-                                <th>Supplier</th>
-                                <th>Stock</th>
-                                <th>Price</th>
-                                <th>Select</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filteredStocks.map(stock => (
-                                <tr key={stock._id}>
-                                    <td>{stock.name}</td>
-                                    <td>{stock.category}</td>
-                                    <td>{stock.supplier}</td>
-                                    <td>{stock.quantity}</td>
-                                    <td>₹{stock.pricePerUnit.toFixed(2)}</td>
-                                    <td>
-                                        <button 
-                                            disabled={stock.quantity === 0}
-                                            onClick={() => handleSelectItem(stock)}
-                                        >
-                                            ➕ Add
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            ) : (
-                <p>No stock found!</p>
-            )}
+          <div className="input-group">
+            <label>Price (per unit)</label>
+            <input
+              type="number"
+              step="0.01"
+              value={formData.price}
+              onChange={handlePriceChange}
+              placeholder="Price"
+            />
+          </div>
 
-            {selectedItems.length > 0 && (
-                <div className="selected-items">
-                    <h3>Selected Items</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Quantity</th>
-                                <th>Price</th>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {selectedItems.map(item => (
-                                <tr key={item._id}>
-                                    <td>{item.name}</td>
-                                    <td>
-                                        <input
-                                            type="number"
-                                            min="1"
-                                            max={item.quantity}
-                                            value={item.quantityToBuy}
-                                            onChange={(e) => handleQuantityChange(item._id, parseInt(e.target.value))}
-                                        />
-                                    </td>
-                                    <td>₹{item.pricePerUnit.toFixed(2)}</td>
-                                    <td>₹{(item.quantityToBuy * item.pricePerUnit).toFixed(2)}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                    <button onClick={generateBill} className="generate-bill">🧾 Generate Bill</button>
-                    <button onClick={() => generatePDF(selectedItems)} className="download-pdf">📄 Download PDF</button>
-                </div>
-            )}
+          <div className="input-group">
+            <label>Total Price</label>
+            <input type="text" value={formData.totalPrice} readOnly />
+          </div>
+
+          <button type="button" className="save-btn" onClick={handleGenerateBill}>
+            Generate Bill
+          </button>
         </div>
-    );
+      </form>
+
+      <div className="table-container">    
+        <table className="table-1">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Quantity</th>
+              <th>Price</th>
+              <th>Date</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {billingDetails.length > 0 ? (
+              billingDetails
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .map((bill, index) => (
+                  <tr key={index}>
+                    <td>{bill.name}</td>
+                    <td>{bill.quantity}</td>
+                    <td>₹{bill.price}</td>
+                    <td>{formatDate(bill.date)}</td>
+                    <td>₹{bill.totalPrice}</td>
+                  </tr>
+                ))
+            ) : (
+              <tr>
+                <td colSpan="5" className="no-records">
+                  No billing records found.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
 };
 
 export default Billing;

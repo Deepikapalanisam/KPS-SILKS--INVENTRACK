@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import "../styles/Purchase.css";
+import "../styles/styles.css";
 
 function Purchase() {
     const [purchases, setPurchases] = useState([]);
@@ -11,7 +11,6 @@ function Purchase() {
     const [supplier, setSupplier] = useState("");
     const [category, setCategory] = useState("");
     const [dateOfPurchase, setDateOfPurchase] = useState("");
-    const [showForm, setShowForm] = useState(false);
 
     useEffect(() => {
         fetchPurchases();
@@ -38,18 +37,37 @@ function Purchase() {
 
     const handleAddPurchase = async (e) => {
         e.preventDefault();
+
         if (!name || !quantity || !pricePerUnit || !supplier || !category || !dateOfPurchase) {
-            alert("All fields are required!");
+            alert("All fields including date are required!");
+            return;
+        }
+
+        if (isNaN(quantity) || isNaN(pricePerUnit)) {
+            alert("Quantity and Price Per Unit must be valid numbers.");
             return;
         }
 
         try {
             await axios.post("http://localhost:5000/purchases/add", {
-                name, quantity: Number(quantity), pricePerUnit: Number(pricePerUnit), supplier, category, dateOfPurchase
+                name,
+                quantity: Number(quantity),
+                pricePerUnit: Number(pricePerUnit),
+                supplier,
+                category,
+                dateOfPurchase: new Date(dateOfPurchase).toISOString() // 🔥 Ensure valid date format
             });
+
+            alert("Purchase added successfully!");
             fetchPurchases();
-            setShowForm(false);
-            setName(""); setQuantity(""); setPricePerUnit(""); setSupplier(""); setCategory(""); setDateOfPurchase("");
+
+            // Clear form
+            setName("");
+            setQuantity("");
+            setPricePerUnit("");
+            setSupplier("");
+            setCategory("");
+            setDateOfPurchase("");
         } catch (error) {
             alert(error.response?.data?.error || "Error adding purchase");
         }
@@ -68,65 +86,134 @@ function Purchase() {
 
     return (
         <div className="container">
-            <h2 className="text-5xl font-carattere">Purchases</h2>
-            <button className="add-btn" onClick={() => setShowForm(!showForm)}>
-                {showForm ? "Close Form" : "Add Purchase"}
-            </button>
+            <h2 className="title">Purchase Entry</h2>
 
-            {showForm && (
-                <form onSubmit={handleAddPurchase} className="form">
-                    <input type="text" placeholder="Product Name" value={name} onChange={(e) => setName(e.target.value)} required />
-                    <input type="number" placeholder="Quantity" value={quantity} onChange={(e) => setQuantity(e.target.value)} required />
-                    <input type="number" placeholder="Price Per Unit" value={pricePerUnit} onChange={(e) => setPricePerUnit(e.target.value)} required />
-                    
-                    <select value={supplier} onChange={(e) => setSupplier(e.target.value)} required>
-                        <option value="">Select Supplier</option>
-                        {suppliers.map((sup) => (
-                            <option key={sup._id} value={sup._id}>{sup.name}</option>
-                        ))}
-                    </select>
+            <form onSubmit={handleAddPurchase} className="form">
+                <div className="filter-form">
+                    <div className="input-group">
+                        <label>Product Name</label>
+                        <input
+                            type="text"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            placeholder="Enter product name"
+                            required
+                        />
+                    </div>
 
-                    <select value={category} onChange={(e) => setCategory(e.target.value)} required>
-                        <option value="">Select Category</option>
-                        <option value="Men">Men</option>
-                        <option value="Women">Women</option>
-                        <option value="Children">Children</option>
-                    </select>
+                    <div className="input-group">
+                        <label>Category</label>
+                        <select
+                            value={category}
+                            onChange={(e) => setCategory(e.target.value)}
+                            required
+                        >
+                            <option value="">Select Category</option>
+                            <option value="Men">Men</option>
+                            <option value="Women">Women</option>
+                            <option value="Children">Children</option>
+                        </select>
+                    </div>
 
-                    <input type="date" value={dateOfPurchase} onChange={(e) => setDateOfPurchase(e.target.value)} />
+                    <div className="input-group">
+                        <label>Quantity</label>
+                        <input
+                            type="number"
+                            value={quantity}
+                            onChange={(e) => setQuantity(e.target.value)}
+                            placeholder="Enter quantity"
+                            required
+                        />
+                    </div>
 
-                    <button type="submit">Add Purchase</button>
-                </form>
-            )}
+                    <div className="input-group">
+                        <label>Price Per Unit</label>
+                        <input
+                            type="number"
+                            value={pricePerUnit}
+                            onChange={(e) => setPricePerUnit(e.target.value)}
+                            placeholder="Enter price"
+                            required
+                        />
+                    </div>
 
-            <table className="purchase-table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Quantity</th>
-                        <th>Price Per Unit</th>
-                        <th>Supplier</th>
-                        <th>Category</th>
-                        <th>Date</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {purchases.map((purchase) => (
-                        <tr key={purchase._id}>
-                            <td>{purchase.name}</td>
-                            <td>{purchase.quantity}</td>
-                            <td>{purchase.pricePerUnit}</td>
-                            <td>{purchase.supplier?.name || "Unknown"}</td>
-                            <td>{purchase.category}</td>
-                            <td>{new Date(purchase.dateOfPurchase).toLocaleDateString()}</td>
-                            <td>
-                                <button className="delete-btn" onClick={() => handleDeletePurchase(purchase._id)}>Delete</button>
-                            </td>
+                    <div className="input-group">
+                        <label>Supplier</label>
+                        <select
+                            value={supplier}
+                            onChange={(e) => setSupplier(e.target.value)}
+                            required
+                        >
+                            <option value="">Select Supplier</option>
+                            {suppliers.map((sup) => (
+                                <option key={sup._id} value={sup._id}>
+                                    {sup.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="input-group">
+                        <label>Date of Purchase</label>
+                        <input
+                            type="date"
+                            value={dateOfPurchase}
+                            onChange={(e) => setDateOfPurchase(e.target.value)}
+                            required
+                        />
+                    </div>
+
+                    <button type="submit" className="save-btn">Save</button>
+                </div>
+            </form>
+
+            <div className="table-container">
+                <table className="table-1">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Category</th>
+                            <th>Quantity</th>
+                            <th>Price/Unit</th>
+                            <th>Supplier</th>
+                            <th>Date</th>
+                            <th>Actions</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {purchases.length > 0 ? (
+                            purchases.map((purchase) => (
+                                <tr key={purchase._id}>
+                                    <td>{purchase.name}</td>
+                                    <td>{purchase.category}</td>
+                                    <td>{purchase.quantity}</td>
+                                    <td>₹{purchase.pricePerUnit.toFixed(2)}</td>
+                                    <td>{purchase.supplier?.name || "Unknown"}</td>
+                                    <td>
+                                        {purchase.dateOfPurchase
+                                            ? new Date(purchase.dateOfPurchase).toLocaleDateString()
+                                            : "No Date"}
+                                    </td>
+                                    <td>
+                                        <button
+                                            className="delete-btn"
+                                            onClick={() => handleDeletePurchase(purchase._id)}
+                                        >
+                                            Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="7" className="no-records">
+                                    No purchase records found.
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 }
