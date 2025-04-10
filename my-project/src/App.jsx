@@ -35,7 +35,6 @@ function App() {
           <Route path="criticalstock" element={<CriticalStock />} />
           <Route path="purchase" element={<Purchase />} />
         </Route>
-
       </Routes>
     </Router>
   );

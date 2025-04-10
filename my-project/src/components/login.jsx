@@ -1,12 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import loginImage from "../assets/login.jpg";
 import "../styles/login.css";
 
 export default function Login() {
-  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
   const navigate = useNavigate();
+
+  // If the user is already logged in, redirect them to the admin page
+  useEffect(() => {
+    if (localStorage.getItem("loggedIn")) {
+      navigate("/admin");
+    }
+  }, [navigate]);
 
   const handleLogin = async () => {
     try {
@@ -17,11 +24,14 @@ export default function Login() {
       );
 
       if (username === "admin@admin" && password === "admin") {
+        localStorage.setItem("loggedIn", "true");
         navigate("/admin");
       } else if (user) {
         if (username.includes("@admin")) {
+          localStorage.setItem("loggedIn", "true");
           navigate("/admin");
         } else if (username.includes("@billdesk")) {
+          localStorage.setItem("loggedIn", "true");
           navigate("/billdesk");
         } else {
           alert("Access denied!");
@@ -37,12 +47,10 @@ export default function Login() {
 
   return (
     <div className="login-page-container">
-      {/* Left - Image */}
       <div className="image-section">
         <img src={loginImage} alt="Login" />
       </div>
 
-      {/* Right - Login */}
       <div className="form-section">
         <div className="login-box">
           <h2 className="gradient-heading">Welcome Back!</h2>

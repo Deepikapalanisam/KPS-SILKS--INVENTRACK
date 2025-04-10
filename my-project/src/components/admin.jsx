@@ -1,7 +1,25 @@
-import { Outlet, Link, useLocation } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Outlet, Link, useNavigate } from "react-router-dom";
 
 function Admin() {
-  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // If the user is not logged in, navigate to the login page and prevent back navigation
+    if (!localStorage.getItem("loggedIn")) {
+      navigate("/", { replace: true });
+    }
+  }, [navigate]);
+
+  const handleLogout = () => {
+    // Show confirmation message before logging out
+    const confirmLogout = window.confirm("Are you sure you want to logout?");
+    if (confirmLogout) {
+      // Clear login state and redirect to login page
+      localStorage.removeItem("loggedIn");
+      navigate("/", { replace: true });
+    }
+  };
 
   const navItems = [
     { label: "Billing", path: "billing", icon: "receipt_long" },
@@ -22,22 +40,13 @@ function Admin() {
         <nav>
           <ul className="space-y-3">
             {navItems.map(({ label, path, icon }) => {
-              const isActive = location.pathname === `/${path}`; // Only match the exact path
               return (
                 <li key={path}>
                   <Link
                     to={path}
-                    className={`flex items-center gap-4 px-5 py-3 rounded-lg transition-all duration-300 shadow-sm ${
-                      isActive
-                        ? "bg-white text-[#1976d2] font-semibold"
-                        : "bg-[#2196f3] text-white hover:bg-white hover:text-[#1976d2]"
-                    }`}
+                    className="flex items-center gap-4 px-5 py-3 rounded-lg transition-all duration-300 shadow-sm bg-[#2196f3] text-white hover:bg-white hover:text-[#1976d2]"
                   >
-                    <span
-                      className={`material-symbols-outlined text-xl ${
-                        isActive ? "text-[#1976d2]" : "text-white"
-                      }`}
-                    >
+                    <span className="material-symbols-outlined text-xl text-white">
                       {icon}
                     </span>
                     {label}
@@ -47,6 +56,15 @@ function Admin() {
             })}
           </ul>
         </nav>
+
+        {/* Logout Button */}
+        <button
+          className="flex items-center gap-4 px-5 py-3 mt-8 rounded-lg bg-[#f44336] text-white hover:bg-[#d32f2f] w-full transition-all duration-300 shadow-sm"
+          onClick={handleLogout}
+        >
+          <span className="material-symbols-outlined text-xl">exit_to_app</span>
+          Logout
+        </button>
       </aside>
 
       {/* Main Content */}
