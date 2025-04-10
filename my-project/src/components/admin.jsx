@@ -1,8 +1,15 @@
-import React, { useEffect } from "react";
-import { Outlet, Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Outlet, Link, useNavigate, useLocation } from "react-router-dom";
 
 function Admin() {
   const navigate = useNavigate();
+  const location = useLocation();  // Track current location to manage active state
+  const [activeLink, setActiveLink] = useState("");
+
+  // Set active link based on the current path
+  useEffect(() => {
+    setActiveLink(location.pathname.split("/").pop());  // Set the active link based on the current route
+  }, [location]);
 
   useEffect(() => {
     // If the user is not logged in, navigate to the login page and prevent back navigation
@@ -40,13 +47,17 @@ function Admin() {
         <nav>
           <ul className="space-y-3">
             {navItems.map(({ label, path, icon }) => {
+              const isActive = activeLink === path;  // Check if the link is active
               return (
                 <li key={path}>
                   <Link
                     to={path}
-                    className="flex items-center gap-4 px-5 py-3 rounded-lg transition-all duration-300 shadow-sm bg-[#2196f3] text-white hover:bg-white hover:text-[#1976d2]"
+                    className={`flex items-center gap-4 px-5 py-3 rounded-lg transition-all duration-300 shadow-sm 
+                      ${isActive ? "bg-white text-[#1976d2]" : "bg-[#2196f3] text-white"} 
+                      hover:bg-white hover:text-[#1976d2]`}
+                    onClick={() => setActiveLink(path)} // Set the active link on click
                   >
-                    <span className="material-symbols-outlined text-xl text-white">
+                    <span className={`material-symbols-outlined text-xl ${isActive ? "text-[#1976d2]" : "text-white"}`}>
                       {icon}
                     </span>
                     {label}

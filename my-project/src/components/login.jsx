@@ -23,16 +23,13 @@ export default function Login() {
         (u) => u.username === username && u.password === password
       );
 
-      if (username === "admin@admin" && password === "admin") {
+      if (username === "admin@admin" && password === "admin@9876") {
         localStorage.setItem("loggedIn", "true");
         navigate("/admin");
       } else if (user) {
         if (username.includes("@admin")) {
           localStorage.setItem("loggedIn", "true");
           navigate("/admin");
-        } else if (username.includes("@billdesk")) {
-          localStorage.setItem("loggedIn", "true");
-          navigate("/billdesk");
         } else {
           alert("Access denied!");
         }
