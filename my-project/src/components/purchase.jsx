@@ -12,6 +12,7 @@ function Purchase() {
   const [category, setCategory] = useState("");
   const [dateOfPurchase, setDateOfPurchase] = useState("");
   const [showScrollHint, setShowScrollHint] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const tableRef = useRef(null);
 
@@ -23,11 +24,7 @@ function Purchase() {
   useEffect(() => {
     const checkScrollHint = () => {
       const el = tableRef.current;
-      if (el && el.scrollHeight > el.clientHeight) {
-        setShowScrollHint(true);
-      } else {
-        setShowScrollHint(false);
-      }
+      setShowScrollHint(el && el.scrollHeight > el.clientHeight);
     };
 
     checkScrollHint();
@@ -67,7 +64,8 @@ function Purchase() {
     }
 
     try {
-      await axios.post("http://localhost:5000/purchases/add", {
+      setIsLoading(true);
+      const response = await axios.post("http://localhost:5000/purchases/add", {
         name,
         quantity: Number(quantity),
         pricePerUnit: Number(pricePerUnit),
@@ -76,9 +74,11 @@ function Purchase() {
         dateOfPurchase: new Date(dateOfPurchase).toISOString(),
       });
 
+      console.log("Saved purchase:", response.data);
       alert("Purchase added successfully!");
       fetchPurchases();
 
+      // Reset form
       setName("");
       setQuantity("");
       setPricePerUnit("");
@@ -86,7 +86,10 @@ function Purchase() {
       setCategory("");
       setDateOfPurchase("");
     } catch (error) {
+      console.error("Error adding purchase:", error);
       alert(error.response?.data?.error || "Error adding purchase");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -174,7 +177,9 @@ function Purchase() {
             />
           </div>
 
-            <button type="button" className="save-btn">Save</button>
+          <button type="submit" className="save-btn" disabled={isLoading}>
+            {isLoading ? "Saving..." : "Save"}
+          </button>
         </div>
       </form>
 

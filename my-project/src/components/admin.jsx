@@ -3,26 +3,22 @@ import { Outlet, Link, useNavigate, useLocation } from "react-router-dom";
 
 function Admin() {
   const navigate = useNavigate();
-  const location = useLocation();  // Track current location to manage active state
+  const location = useLocation();
   const [activeLink, setActiveLink] = useState("");
 
-  // Set active link based on the current path
   useEffect(() => {
-    setActiveLink(location.pathname.split("/").pop());  // Set the active link based on the current route
+    setActiveLink(location.pathname.split("/").pop());
   }, [location]);
 
   useEffect(() => {
-    // If the user is not logged in, navigate to the login page and prevent back navigation
     if (!localStorage.getItem("loggedIn")) {
       navigate("/", { replace: true });
     }
   }, [navigate]);
 
   const handleLogout = () => {
-    // Show confirmation message before logging out
     const confirmLogout = window.confirm("Are you sure you want to logout?");
     if (confirmLogout) {
-      // Clear login state and redirect to login page
       localStorage.removeItem("loggedIn");
       navigate("/", { replace: true });
     }
@@ -40,24 +36,26 @@ function Admin() {
   return (
     <div className="flex min-h-screen font-poppins bg-[#f4f6f8]">
       {/* Sidebar */}
-      <aside className="w-64 bg-[#1976d2] text-white fixed top-0 left-0 bottom-0 p-6 shadow-lg z-10">
-        <h2 className="text-3xl font-bold mb-12 text-center tracking-wide">
-          KPS Silks
+      <aside className="w-64 bg-[#0a2c66] text-white fixed top-0 left-0 bottom-0 p-6 z-10 shadow-lg">
+        <h2 className="text-3xl font-bold text-center mb-12 tracking-wide leading-tight">
+          KPS SILKS<br />
+          <span className="text-lg font-light">Admin</span>
         </h2>
+
         <nav>
           <ul className="space-y-3">
             {navItems.map(({ label, path, icon }) => {
-              const isActive = activeLink === path;  // Check if the link is active
+              const isActive = activeLink === path;
               return (
                 <li key={path}>
                   <Link
                     to={path}
+                    onClick={() => setActiveLink(path)}
                     className={`flex items-center gap-4 px-5 py-3 rounded-lg transition-all duration-300 shadow-sm 
-                      ${isActive ? "bg-white text-[#1976d2]" : "bg-[#2196f3] text-white"} 
-                      hover:bg-white hover:text-[#1976d2]`}
-                    onClick={() => setActiveLink(path)} // Set the active link on click
+                      ${isActive ? "bg-white text-[#0a2c66]" : "bg-[#1976d2] text-white"} 
+                      hover:bg-white hover:text-[#0a2c66]"`}
                   >
-                    <span className={`material-symbols-outlined text-xl ${isActive ? "text-[#1976d2]" : "text-white"}`}>
+                    <span className={`material-symbols-outlined text-xl ${isActive ? "text-[#0a2c66]" : "text-white"}`}>
                       {icon}
                     </span>
                     {label}
@@ -68,18 +66,17 @@ function Admin() {
           </ul>
         </nav>
 
-        {/* Logout Button */}
         <button
-          className="flex items-center gap-4 px-5 py-3 mt-8 rounded-lg bg-[#f44336] text-white hover:bg-[#d32f2f] w-full transition-all duration-300 shadow-sm"
           onClick={handleLogout}
+          className="flex items-center gap-4 px-5 py-3 mt-8 w-full rounded-lg bg-[#e53935] hover:bg-[#c62828] text-white transition-all duration-300 shadow-sm"
         >
-          <span className="material-symbols-outlined text-xl">exit_to_app</span>
+          <span className="material-symbols-outlined text-xl">logout</span>
           Logout
         </button>
       </aside>
 
       {/* Main Content */}
-      <main className="ml-64 w-full p-10">
+      <main className="ml-64 w-full p-8 sm:p-10">
         <Outlet />
       </main>
     </div>

@@ -8,37 +8,50 @@ export default function Login() {
   const [username, setUsername] = useState("");
   const navigate = useNavigate();
 
-  // If the user is already logged in, redirect them to the admin page
   useEffect(() => {
+    const role = localStorage.getItem("role");
     if (localStorage.getItem("loggedIn")) {
-      navigate("/admin");
+      if (role === "admin") {
+        navigate("/admin");
+      } else if (role === "billdesk") {
+        navigate("/billdesk");
+      }
     }
   }, [navigate]);
 
   const handleLogin = async () => {
+    if (!username || !password) {
+      alert("Please enter both username and password.");
+      return;
+    }
+
+    if (username === "admin@admin" && password === "admin9876") {
+      localStorage.setItem("loggedIn", "true");
+      localStorage.setItem("role", "admin");
+      navigate("/admin", { replace: true });
+      return;
+    }
+    
+
     try {
       const response = await fetch("http://localhost:5000/users");
+      if (!response.ok) throw new Error("Network response was not ok");
+
       const users = await response.json();
       const user = users.find(
         (u) => u.username === username && u.password === password
       );
 
-      if (username === "admin@admin" && password === "admin@9876") {
+      if (user && username.includes("@billdesk")) {
         localStorage.setItem("loggedIn", "true");
-        navigate("/admin");
-      } else if (user) {
-        if (username.includes("@admin")) {
-          localStorage.setItem("loggedIn", "true");
-          navigate("/admin");
-        } else {
-          alert("Access denied!");
-        }
+        localStorage.setItem("role", "billdesk");
+        navigate("/billdesk");
       } else {
-        alert("Invalid username or password!");
+        alert("Invalid credentials or unauthorized access.");
       }
     } catch (error) {
       console.error("Login error:", error);
-      alert("Server error, please try again later.");
+      alert("Server error. Please try again later.");
     }
   };
 

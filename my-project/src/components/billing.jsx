@@ -16,14 +16,18 @@ const Billing = () => {
   const tableRef = useRef(null);
   const [showScrollHint, setShowScrollHint] = useState(false);
 
+  // Fetch stock and billing details on component mount
   useEffect(() => {
-    axios.get("http://localhost:5000/stock")
+    axios
+      .get("http://localhost:5000/stock")
       .then((res) => setStockData(res.data))
       .catch((err) => console.error("Error fetching stock:", err));
 
-    axios.get("http://localhost:5000/billings")
+    axios
+      .get("http://localhost:5000/billing")
       .then((res) => {
         setBillingDetails(res.data);
+        // Check for scroll hint after table renders
         setTimeout(checkScrollHint, 100);
       })
       .catch((err) => console.error("Error fetching billings:", err));
@@ -50,7 +54,7 @@ const Billing = () => {
   };
 
   const handleQuantityChange = (e) => {
-    const quantity = parseInt(e.target.value) || 0;
+    const quantity = parseInt(e.target.value, 10) || 0;
     setFormData((prev) => ({
       ...prev,
       quantity,
@@ -69,10 +73,12 @@ const Billing = () => {
 
   const handleGenerateBill = async () => {
     const item = stockData.find((item) => item.name === formData.name);
-    const quantity = parseInt(formData.quantity);
+    const quantity = parseInt(formData.quantity, 10);
     const price = parseFloat(formData.price);
     const totalPrice = price * quantity;
+    const date = new Date().toISOString().split("T")[0]; // Format: YYYY-MM-DD
 
+    // Validate required fields
     if (!item || !quantity || !price) {
       alert("Please select a valid item, quantity, and price.");
       return;
@@ -83,28 +89,33 @@ const Billing = () => {
       return;
     }
 
+    // Calculate updated quantity in stock
     const updatedQuantity = item.quantity - quantity;
 
     try {
+      // Update stock quantity first
       await axios.put(`http://localhost:5000/stock/${item._id}`, {
         quantity: updatedQuantity,
       });
 
-      const res = await axios.post("http://localhost:5000/billings", {
+      // Post new bill including date
+      const res = await axios.post("http://localhost:5000/billing", {
         name: formData.name,
         quantity,
         price,
         totalPrice,
+        date,
       });
 
+      // Add the new bill to billing details (latest first)
       setBillingDetails((prev) => [res.data, ...prev]);
       setSelectedItem("");
       setFormData({ name: "", quantity: "", price: "", totalPrice: 0 });
       alert("Bill generated successfully!");
       setTimeout(checkScrollHint, 100);
     } catch (err) {
-      console.error("Error saving the bill:", err);
-      alert("Error generating bill. Check console.");
+      console.error("Error generating bill:", err);
+      alert("Error generating bill. Please check the console.");
     }
   };
 
@@ -149,7 +160,11 @@ const Billing = () => {
             <input type="text" value={formData.totalPrice} readOnly />
           </div>
 
-          <button type="button" className="save-btn" onClick={handleGenerateBill}>
+          <button
+            type="button"
+            className="save-btn"
+            onClick={handleGenerateBill}
+          >
             Generate Bill
           </button>
         </div>

@@ -8,15 +8,13 @@ import Login from "./components/login";
 import Stock from "./components/stock";
 import Suppliers from "./components/suppliers";
 import Purchase from "./components/purchase";
+import Billdesk from "./components/billdesk";
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* Login Route */}
         <Route path="/" element={<Login />} />
-
-        {/* Admin Section */}
         <Route path="/admin" element={<Admin />}>
           <Route index element={<Stock />} />
           <Route path="stock" element={<Stock />} />
@@ -25,6 +23,12 @@ function App() {
           <Route path="criticalstock" element={<CriticalStock />} />
           <Route path="purchase" element={<Purchase />} />
           <Route path="suppliers" element={<Suppliers />} />
+        </Route>
+        <Route path="/billdesk" element={<Billdesk />}>
+          <Route index element={<Billing />} />
+          <Route path="stock" element={<Stock />} />
+          <Route path="billing" element={<Billing />} />
+          <Route path="criticalstock" element={<CriticalStock />} />
         </Route>
       </Routes>
     </Router>
