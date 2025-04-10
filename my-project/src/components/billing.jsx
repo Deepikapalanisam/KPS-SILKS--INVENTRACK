@@ -115,7 +115,6 @@ const Billing = () => {
       <form className="form">
         <div className="filter-form">
           <div className="input-group">
-            <label>Item</label>
             <select value={selectedItem} onChange={handleItemChange}>
               <option value="">Select item</option>
               {stockData.map((item) => (
@@ -127,7 +126,6 @@ const Billing = () => {
           </div>
 
           <div className="input-group">
-            <label>Quantity</label>
             <input
               type="number"
               min="1"
@@ -138,7 +136,6 @@ const Billing = () => {
           </div>
 
           <div className="input-group">
-            <label>Price (per unit)</label>
             <input
               type="number"
               step="0.01"
@@ -149,7 +146,6 @@ const Billing = () => {
           </div>
 
           <div className="input-group">
-            <label>Total Price</label>
             <input type="text" value={formData.totalPrice} readOnly />
           </div>
 

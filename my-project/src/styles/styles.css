@@ -18,7 +18,7 @@ html, body {
 /* Container layouts */
 .container,
 .form-container {
-  padding: 20px;
+  padding: 10px;
   max-width: 1200px;
   margin: 0 auto;
   display: flex;
@@ -56,6 +56,10 @@ select {
   background-color: #ffffff;
   color: #1f2a40;
   transition: border 0.3s, box-shadow 0.3s;
+  box-sizing: border-box;
+  min-width: 250px;
+  display: flex;
+  align-items: center;
 }
 
 input:focus,
@@ -65,6 +69,28 @@ select:focus {
   outline: none;
 }
 
+/* Input wrapper for icons */
+.input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.input-wrapper span.material-symbols-outlined {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+  font-size: 22px;
+  color: #90a4ae;
+  pointer-events: none;
+}
+
+.input-wrapper input,
+.input-wrapper select {
+  padding-left: 30px; /* Adding space for the icon */
+}
+
+/* Filter Form Layout */
 .filter-form {
   display: flex;
   flex-wrap: wrap;
@@ -73,18 +99,48 @@ select:focus {
   margin-bottom: 20px;
 }
 
+/* Form Layout with Consistent Gap */
+.horizontal-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.horizontal-form input,
+.horizontal-form select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  min-width: 250px;
+  font-size: 14px;
+}
+
+.horizontal-form button {
+  height: 38px;
+  padding: 0 12px;
+  font-size: 14px;
+  white-space: nowrap;
+  line-height: 1;
+  align-self: center;
+}
+
 /* Buttons */
 button,
 .save-btn,
 .delete-btn,
 .edit-btn,
 .cancel-btn {
-  padding: 8px 16px;
+  padding: 6px 12px;
   font-size: 14px;
+  line-height: 1.2;
   border: none;
   border-radius: 6px;
   cursor: pointer;
   font-weight: 500;
+  white-space: nowrap;
   transition: background-color 0.3s ease;
 }
 
@@ -166,8 +222,8 @@ td {
   left: 50%;
   transform: translateX(-50%);
   font-size: 22px;
-  color:white ; /* Dark blue for contrast */
-  background-color:#0a2c66; /* Light blue background */
+  color: white;
+  background-color: #0a2c66;
   border-radius: 50px;
   padding: 2px 4px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
@@ -177,14 +233,9 @@ td {
 }
 
 @keyframes bounce {
-  0%, 100% {
-    transform: translateX(-50%) scale(1);
-  }
-  50% {
-    transform: translateX(-50%) scale(1.15) translateY(6px);
-  }
+  0%, 100% { transform: translateX(-50%) scale(1); }
+  50% { transform: translateX(-50%) scale(1.15) translateY(6px); }
 }
-
 
 /* Special row coloring */
 .critical {
@@ -196,51 +247,4 @@ td {
 .warning {
   background-color: #fff8e1;
   color: #f57f17;
-}
-
-/* Dark blue sidebar */
-.sidebar {
-  background-color: #0d47a1;
-  color: white;
-  padding: 20px;
-  width: 16rem;
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.sidebar h3 {
-  color: #bbdefb;
-  margin-bottom: 20px;
-}
-
-.sidebar a {
-  color: white;
-  text-decoration: none;
-  display: block;
-  padding: 10px;
-  border-radius: 6px;
-  transition: background-color 0.2s ease;
-}
-
-.sidebar a:hover {
-  background-color: #1565c0;
-}
-/* Form Layout with Consistent Gap */
-.horizontal-form {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: center;
-  margin-bottom: 20px;
-}
-
-.horizontal-form input {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  min-width: 250px;
-  font-size: 14px;
 }

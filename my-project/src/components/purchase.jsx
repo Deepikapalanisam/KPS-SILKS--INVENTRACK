@@ -108,7 +108,6 @@ function Purchase() {
       <form onSubmit={handleAddPurchase} className="form">
         <div className="filter-form">
           <div className="input-group">
-            <label>Product Name</label>
             <input
               type="text"
               value={name}
@@ -119,7 +118,6 @@ function Purchase() {
           </div>
 
           <div className="input-group">
-            <label>Category</label>
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
@@ -133,7 +131,6 @@ function Purchase() {
           </div>
 
           <div className="input-group">
-            <label>Quantity</label>
             <input
               type="number"
               value={quantity}
@@ -144,7 +141,6 @@ function Purchase() {
           </div>
 
           <div className="input-group">
-            <label>Price Per Unit</label>
             <input
               type="number"
               value={pricePerUnit}
@@ -155,7 +151,6 @@ function Purchase() {
           </div>
 
           <div className="input-group">
-            <label>Supplier</label>
             <select
               value={supplier}
               onChange={(e) => setSupplier(e.target.value)}
@@ -171,7 +166,6 @@ function Purchase() {
           </div>
 
           <div className="input-group">
-            <label>Date of Purchase</label>
             <input
               type="date"
               value={dateOfPurchase}
@@ -180,7 +174,7 @@ function Purchase() {
             />
           </div>
 
-          <button type="submit" className="save-btn">Save</button>
+            <button type="button" className="save-btn">Save</button>
         </div>
       </form>
 

@@ -106,4 +106,4 @@ const Stock = () => {
   );
 };
 
-export default Stock;
+export default Stock; 
