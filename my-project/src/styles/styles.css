@@ -36,9 +36,10 @@ html, body {
 }
 
 .gradient-heading {
+  font-family: 'Special Gothic Expanded One', sans-serif;
   font-size: 2.5rem;
   font-weight: 800;
-  background: linear-gradient(to right, #0d47a1, #1e88e5, #42a5f5);
+  background: linear-gradient(to right, #2563eb, #9333ea, #ec4899);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: 10px;
@@ -226,4 +227,20 @@ td {
 
 .sidebar a:hover {
   background-color: #1565c0;
+}
+/* Form Layout with Consistent Gap */
+.horizontal-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.horizontal-form input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  min-width: 250px;
+  font-size: 14px;
 }

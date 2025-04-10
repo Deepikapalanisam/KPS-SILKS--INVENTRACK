@@ -16,14 +16,11 @@ const Stock = () => {
 
   useEffect(() => {
     const checkScrollHint = () => {
-      const el = tableRef.current;
-      if (el && el.scrollHeight > el.clientHeight) {
-        setShowScrollHint(true);
-      } else {
-        setShowScrollHint(false);
+      if (tableRef.current) {
+        const { scrollHeight, clientHeight } = tableRef.current;
+        setShowScrollHint(scrollHeight > clientHeight);
       }
     };
-
     checkScrollHint();
     window.addEventListener("resize", checkScrollHint);
     return () => window.removeEventListener("resize", checkScrollHint);
@@ -46,9 +43,9 @@ const Stock = () => {
 
   return (
     <div className="container">
-      <h2 className="title">Stock List</h2>
+      <h2 className="gradient-heading">Stock List</h2>
 
-      <div className="filter-form">
+      <form className="filter-form">
         <input
           type="text"
           placeholder="Search by name..."
@@ -67,9 +64,9 @@ const Stock = () => {
           value={supplier}
           onChange={(e) => setSupplier(e.target.value)}
         />
-      </div>
+      </form>
 
-      <div className="table-container relative" ref={tableRef}>
+      <div className="table-container" ref={tableRef}>
         <table className="table-1">
           <thead>
             <tr>
@@ -93,15 +90,12 @@ const Stock = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="5" className="no-records">
-                  No stock items found.
-                </td>
+                <td colSpan="5" className="no-records">No stock items found.</td>
               </tr>
             )}
           </tbody>
         </table>
 
-        {/* Scroll hint icon */}
         {showScrollHint && (
           <span className="material-symbols-outlined scroll-hint-icon">
             arrow_downward_alt

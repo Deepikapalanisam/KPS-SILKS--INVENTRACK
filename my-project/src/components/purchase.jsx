@@ -103,7 +103,7 @@ function Purchase() {
 
   return (
     <div className="container">
-      <h2 className="title">Purchase Entry</h2>
+      <h2 className="gradient-heading">Purchase Entry</h2>
 
       <form onSubmit={handleAddPurchase} className="form">
         <div className="filter-form">
@@ -184,7 +184,7 @@ function Purchase() {
         </div>
       </form>
 
-      <div className="table-container relative" ref={tableRef}>
+      <div className="table-container" ref={tableRef}>
         <table className="table-1">
           <thead>
             <tr>
@@ -231,7 +231,6 @@ function Purchase() {
           </tbody>
         </table>
 
-        {/* Scroll hint icon */}
         {showScrollHint && (
           <span className="material-symbols-outlined scroll-hint-icon">
             arrow_downward_alt

@@ -24,18 +24,14 @@ const Billing = () => {
     axios.get("http://localhost:5000/billings")
       .then((res) => {
         setBillingDetails(res.data);
-        setTimeout(checkScrollHint, 100); // Give DOM time to render
+        setTimeout(checkScrollHint, 100);
       })
       .catch((err) => console.error("Error fetching billings:", err));
   }, []);
 
   const checkScrollHint = () => {
     const el = tableRef.current;
-    if (el && el.scrollHeight > el.clientHeight) {
-      setShowScrollHint(true);
-    } else {
-      setShowScrollHint(false);
-    }
+    setShowScrollHint(el && el.scrollHeight > el.clientHeight);
   };
 
   const handleItemChange = (e) => {
@@ -114,7 +110,7 @@ const Billing = () => {
 
   return (
     <div className="container">
-      <h2 className="title">Billing</h2>
+      <h2 className="gradient-heading">Billing Section</h2>
 
       <form className="form">
         <div className="filter-form">
@@ -195,7 +191,6 @@ const Billing = () => {
           </tbody>
         </table>
 
-        {/* Scroll hint icon */}
         {showScrollHint && (
           <span className="material-symbols-outlined scroll-hint-icon">
             arrow_downward_alt

@@ -109,18 +109,9 @@ function AddUser() {
 
   return (
     <div className="container">
-      <h2 className="title">Add User</h2>
-      <form
-        onSubmit={handleAddUser}
-        className="horizontal-form"
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "20px",
-          justifyContent: "center",
-          marginBottom: "20px",
-        }}
-      >
+      <h2 className="gradient-heading">Add User</h2>
+
+      <form onSubmit={handleAddUser} className="horizontal-form">
         <input
           type="text"
           placeholder="Username (e.g., name@admin or name@billdesk)"
@@ -136,7 +127,8 @@ function AddUser() {
         <button type="submit" className="save-btn">Add User</button>
       </form>
 
-      <h2 className="title">User List</h2>
+      <h2 className="gradient-heading">User List</h2>
+
       <div className="table-container relative" ref={tableRef}>
         <table className="table-1">
           <thead>
@@ -159,6 +151,7 @@ function AddUser() {
                       <td>
                         <input
                           type="text"
+                          className="table-input"
                           value={editedUsername}
                           onChange={(e) => setEditedUsername(e.target.value)}
                         />
@@ -166,12 +159,13 @@ function AddUser() {
                       <td>
                         <input
                           type="password"
+                          className="table-input"
                           value={editedPassword}
                           onChange={(e) => setEditedPassword(e.target.value)}
                         />
                       </td>
                       <td>
-                        <div style={{ display: "flex", gap: "10px" }}>
+                        <div className="action-buttons">
                           <button className="save-btn" onClick={() => handleSaveEdit(user._id)}>Save</button>
                           <button className="cancel-btn" onClick={() => setEditMode(null)}>Cancel</button>
                         </div>
@@ -182,7 +176,7 @@ function AddUser() {
                       <td>{user.username}</td>
                       <td>{user.password}</td>
                       <td>
-                        <div style={{ display: "flex", gap: "10px" }}>
+                        <div className="action-buttons">
                           <button className="edit-btn" onClick={() => handleEditClick(user)}>Edit</button>
                           <button className="delete-btn" onClick={() => handleDelete(user._id)}>Delete</button>
                         </div>
@@ -195,7 +189,6 @@ function AddUser() {
           </tbody>
         </table>
 
-        {/* Scroll arrow hint */}
         {showScrollHint && (
           <span className="material-symbols-outlined scroll-hint-icon">
             arrow_downward_alt

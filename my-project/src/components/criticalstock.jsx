@@ -47,7 +47,7 @@ const CriticalStock = () => {
 
   return (
     <div className="container">
-      <h2 className="title">Critical Stock Items</h2>
+      <h2 className="gradient-heading">Critical Stock Items</h2>
 
       <div className="filter-form">
         <input

@@ -46,7 +46,6 @@ function Supplier() {
 
   const handleAddSupplier = async (e) => {
     e.preventDefault();
-
     if (!name || !email || !contactNo) return alert("All fields are required!");
     if (!emailRegex.test(email)) return alert("Invalid email format!");
     if (!mobileRegex.test(contactNo)) return alert("Contact number must be exactly 10 digits!");
@@ -105,18 +104,9 @@ function Supplier() {
 
   return (
     <div className="container">
-      <h2 className="title">Add Supplier</h2>
-      <form
-        onSubmit={handleAddSupplier}
-        className="horizontal-form"
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "20px",
-          justifyContent: "center",
-          marginBottom: "20px",
-        }}
-      >
+      <h2 className="gradient-heading">Add Supplier</h2>
+
+      <form onSubmit={handleAddSupplier} className="horizontal-form">
         <input
           type="text"
           placeholder="Supplier Name"
@@ -138,8 +128,9 @@ function Supplier() {
         <button type="submit" className="save-btn">Add</button>
       </form>
 
-      <h2 className="title">Supplier List</h2>
-      <div className="table-container" ref={tableRef}>
+      <h2 className="gradient-heading">Supplier List</h2>
+
+      <div className="table-container relative" ref={tableRef}>
         <table className="table-1">
           <thead>
             <tr>
@@ -159,12 +150,32 @@ function Supplier() {
                 <tr key={supplier._id}>
                   {editMode === supplier._id ? (
                     <>
-                      <td><input value={editedName} onChange={(e) => setEditedName(e.target.value)} /></td>
-                      <td><input value={editedEmail} onChange={(e) => setEditedEmail(e.target.value)} /></td>
-                      <td><input value={editedContactNo} onChange={(e) => setEditedContactNo(e.target.value)} /></td>
                       <td>
-                        <button className="save-btn" onClick={() => handleSaveEdit(supplier._id)}>Save</button>
-                        <button className="cancel-btn" onClick={() => setEditMode(null)}>Cancel</button>
+                        <input
+                          className="table-input"
+                          value={editedName}
+                          onChange={(e) => setEditedName(e.target.value)}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          className="table-input"
+                          value={editedEmail}
+                          onChange={(e) => setEditedEmail(e.target.value)}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          className="table-input"
+                          value={editedContactNo}
+                          onChange={(e) => setEditedContactNo(e.target.value)}
+                        />
+                      </td>
+                      <td>
+                        <div className="action-buttons">
+                          <button className="save-btn" onClick={() => handleSaveEdit(supplier._id)}>Save</button>
+                          <button className="cancel-btn" onClick={() => setEditMode(null)}>Cancel</button>
+                        </div>
                       </td>
                     </>
                   ) : (
@@ -173,8 +184,10 @@ function Supplier() {
                       <td>{supplier.email}</td>
                       <td>{supplier.contactNo}</td>
                       <td>
-                        <button className="edit-btn" onClick={() => handleEditClick(supplier)}>Edit</button>
-                        <button className="delete-btn" onClick={() => handleDelete(supplier._id)}>Delete</button>
+                        <div className="action-buttons">
+                          <button className="edit-btn" onClick={() => handleEditClick(supplier)}>Edit</button>
+                          <button className="delete-btn" onClick={() => handleDelete(supplier._id)}>Delete</button>
+                        </div>
                       </td>
                     </>
                   )}
@@ -183,9 +196,13 @@ function Supplier() {
             )}
           </tbody>
         </table>
-      </div>
 
-      {showScrollHint && <div className="scroll-hint-icon">↓</div>}
+        {showScrollHint && (
+          <span className="material-symbols-outlined scroll-hint-icon">
+            arrow_downward_alt
+          </span>
+        )}
+      </div>
     </div>
   );
 }
