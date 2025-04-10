@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import "../styles/styles.css";
 
 const Billing = () => {
   const [stockData, setStockData] = useState([]);
+  const [billingDetails, setBillingDetails] = useState([]);
   const [selectedItem, setSelectedItem] = useState("");
   const [formData, setFormData] = useState({
     name: "",
@@ -11,17 +12,31 @@ const Billing = () => {
     price: "",
     totalPrice: 0,
   });
-  const [billingDetails, setBillingDetails] = useState([]);
+
+  const tableRef = useRef(null);
+  const [showScrollHint, setShowScrollHint] = useState(false);
 
   useEffect(() => {
     axios.get("http://localhost:5000/stock")
       .then((res) => setStockData(res.data))
-      .catch((err) => console.error(err));
+      .catch((err) => console.error("Error fetching stock:", err));
 
-    axios.get("http://localhost:5000/billing")
-      .then((res) => setBillingDetails(res.data))
-      .catch((err) => console.error(err));
+    axios.get("http://localhost:5000/billings")
+      .then((res) => {
+        setBillingDetails(res.data);
+        setTimeout(checkScrollHint, 100); // Give DOM time to render
+      })
+      .catch((err) => console.error("Error fetching billings:", err));
   }, []);
+
+  const checkScrollHint = () => {
+    const el = tableRef.current;
+    if (el && el.scrollHeight > el.clientHeight) {
+      setShowScrollHint(true);
+    } else {
+      setShowScrollHint(false);
+    }
+  };
 
   const handleItemChange = (e) => {
     const name = e.target.value;
@@ -32,7 +47,7 @@ const Billing = () => {
       setFormData({
         name: item.name,
         quantity: "",
-        price: "",
+        price: item.pricePerUnit || 0,
         totalPrice: 0,
       });
     }
@@ -56,49 +71,45 @@ const Billing = () => {
     }));
   };
 
-  const handleGenerateBill = () => {
+  const handleGenerateBill = async () => {
     const item = stockData.find((item) => item.name === formData.name);
+    const quantity = parseInt(formData.quantity);
+    const price = parseFloat(formData.price);
+    const totalPrice = price * quantity;
 
-    if (item && item.quantity >= formData.quantity) {
-      const updatedQuantity = item.quantity - formData.quantity;
-
-      axios.put(`http://localhost:5000/stock/${item._id}`, {
-        quantity: updatedQuantity,
-      }).then(() => {
-        const currentDate = new Date().toISOString().split('T')[0];
-
-        axios.post("http://localhost:5000/billing", {
-          name: formData.name,
-          quantity: formData.quantity,
-          price: formData.price,
-          totalPrice: formData.totalPrice,
-          date: currentDate,
-        }).then((response) => {
-          setBillingDetails((prev) => [...prev, response.data]);
-          setSelectedItem("");
-          setFormData({
-            name: "",
-            quantity: "",
-            price: "",
-            totalPrice: 0,
-          });
-        }).catch((err) => {
-          console.error("Error saving the bill:", err);
-        });
-      }).catch((err) => {
-        console.error("Error updating stock:", err);
-      });
-    } else {
-      alert("Not enough stock available!");
+    if (!item || !quantity || !price) {
+      alert("Please select a valid item, quantity, and price.");
+      return;
     }
-  };
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = String(date.getFullYear()).slice(-2);
-    return `${day}-${month}-${year}`;
+    if (item.quantity < quantity) {
+      alert("Not enough stock available!");
+      return;
+    }
+
+    const updatedQuantity = item.quantity - quantity;
+
+    try {
+      await axios.put(`http://localhost:5000/stock/${item._id}`, {
+        quantity: updatedQuantity,
+      });
+
+      const res = await axios.post("http://localhost:5000/billings", {
+        name: formData.name,
+        quantity,
+        price,
+        totalPrice,
+      });
+
+      setBillingDetails((prev) => [res.data, ...prev]);
+      setSelectedItem("");
+      setFormData({ name: "", quantity: "", price: "", totalPrice: 0 });
+      alert("Bill generated successfully!");
+      setTimeout(checkScrollHint, 100);
+    } catch (err) {
+      console.error("Error saving the bill:", err);
+      alert("Error generating bill. Check console.");
+    }
   };
 
   return (
@@ -123,6 +134,7 @@ const Billing = () => {
             <label>Quantity</label>
             <input
               type="number"
+              min="1"
               value={formData.quantity}
               onChange={handleQuantityChange}
               placeholder="Quantity"
@@ -151,7 +163,7 @@ const Billing = () => {
         </div>
       </form>
 
-      <div className="table-container">    
+      <div className="table-container relative" ref={tableRef}>
         <table className="table-1">
           <thead>
             <tr>
@@ -164,17 +176,15 @@ const Billing = () => {
           </thead>
           <tbody>
             {billingDetails.length > 0 ? (
-              billingDetails
-                .sort((a, b) => new Date(b.date) - new Date(a.date))
-                .map((bill, index) => (
-                  <tr key={index}>
-                    <td>{bill.name}</td>
-                    <td>{bill.quantity}</td>
-                    <td>₹{bill.price}</td>
-                    <td>{formatDate(bill.date)}</td>
-                    <td>₹{bill.totalPrice}</td>
-                  </tr>
-                ))
+              billingDetails.map((bill, index) => (
+                <tr key={index}>
+                  <td>{bill.name}</td>
+                  <td>{bill.quantity}</td>
+                  <td>₹{bill.price}</td>
+                  <td>{bill.date}</td>
+                  <td>₹{bill.totalPrice}</td>
+                </tr>
+              ))
             ) : (
               <tr>
                 <td colSpan="5" className="no-records">
@@ -184,6 +194,13 @@ const Billing = () => {
             )}
           </tbody>
         </table>
+
+        {/* Scroll hint icon */}
+        {showScrollHint && (
+          <span className="material-symbols-outlined scroll-hint-icon">
+            arrow_downward_alt
+          </span>
+        )}
       </div>
     </div>
   );

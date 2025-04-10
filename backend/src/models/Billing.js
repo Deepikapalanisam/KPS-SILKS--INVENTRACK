@@ -20,7 +20,7 @@ const billingSchema = new mongoose.Schema({
   },
   date: {
     type: Date,
-    default: Date.now,
+    default: () => new Date(),  // ✅ Use function for correct timestamp
   },
 });
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import "../styles/styles.css";
 
@@ -7,10 +7,27 @@ const CriticalStock = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [category, setCategory] = useState("");
   const [supplier, setSupplier] = useState("");
+  const [showScrollHint, setShowScrollHint] = useState(false);
+  const tableRef = useRef(null);
 
   useEffect(() => {
     fetchStocks();
   }, []);
+
+  useEffect(() => {
+    const checkScrollHint = () => {
+      const el = tableRef.current;
+      if (el && el.scrollHeight > el.clientHeight) {
+        setShowScrollHint(true);
+      } else {
+        setShowScrollHint(false);
+      }
+    };
+
+    checkScrollHint();
+    window.addEventListener("resize", checkScrollHint);
+    return () => window.removeEventListener("resize", checkScrollHint);
+  }, [stocks]);
 
   const fetchStocks = async () => {
     try {
@@ -53,7 +70,7 @@ const CriticalStock = () => {
         />
       </div>
 
-      <div className="table-container">
+      <div className="table-container relative" ref={tableRef}>
         <table className="table-1">
           <thead>
             <tr>
@@ -87,6 +104,13 @@ const CriticalStock = () => {
             )}
           </tbody>
         </table>
+
+        {/* Scroll hint icon */}
+        {showScrollHint && (
+          <span className="material-symbols-outlined scroll-hint-icon">
+            arrow_downward_alt
+          </span>
+        )}
       </div>
     </div>
   );

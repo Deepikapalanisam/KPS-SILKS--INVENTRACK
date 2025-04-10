@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import "../styles/styles.css";
 
@@ -9,10 +9,26 @@ function AddUser() {
   const [editMode, setEditMode] = useState(null);
   const [editedUsername, setEditedUsername] = useState("");
   const [editedPassword, setEditedPassword] = useState("");
+  const [showScrollHint, setShowScrollHint] = useState(false);
+
+  const tableRef = useRef(null);
 
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  useEffect(() => {
+    checkTableScroll();
+    window.addEventListener("resize", checkTableScroll);
+    return () => window.removeEventListener("resize", checkTableScroll);
+  }, [users]);
+
+  const checkTableScroll = () => {
+    if (tableRef.current) {
+      const { scrollHeight, clientHeight } = tableRef.current;
+      setShowScrollHint(scrollHeight > clientHeight);
+    }
+  };
 
   const fetchUsers = async () => {
     try {
@@ -100,7 +116,7 @@ function AddUser() {
         style={{
           display: "flex",
           flexWrap: "wrap",
-          gap: "20px", // 👈 Increased spacing between fields
+          gap: "20px",
           justifyContent: "center",
           marginBottom: "20px",
         }}
@@ -121,7 +137,7 @@ function AddUser() {
       </form>
 
       <h2 className="title">User List</h2>
-      <div className="table-container">
+      <div className="table-container relative" ref={tableRef}>
         <table className="table-1">
           <thead>
             <tr>
@@ -155,8 +171,10 @@ function AddUser() {
                         />
                       </td>
                       <td>
-                        <button className="save-btn" onClick={() => handleSaveEdit(user._id)}>Save</button>
-                        <button className="cancel-btn" onClick={() => setEditMode(null)}>Cancel</button>
+                        <div style={{ display: "flex", gap: "10px" }}>
+                          <button className="save-btn" onClick={() => handleSaveEdit(user._id)}>Save</button>
+                          <button className="cancel-btn" onClick={() => setEditMode(null)}>Cancel</button>
+                        </div>
                       </td>
                     </>
                   ) : (
@@ -164,8 +182,10 @@ function AddUser() {
                       <td>{user.username}</td>
                       <td>{user.password}</td>
                       <td>
-                        <button className="edit-btn" onClick={() => handleEditClick(user)}>Edit</button>
-                        <button className="delete-btn" onClick={() => handleDelete(user._id)}>Delete</button>
+                        <div style={{ display: "flex", gap: "10px" }}>
+                          <button className="edit-btn" onClick={() => handleEditClick(user)}>Edit</button>
+                          <button className="delete-btn" onClick={() => handleDelete(user._id)}>Delete</button>
+                        </div>
                       </td>
                     </>
                   )}
@@ -174,6 +194,13 @@ function AddUser() {
             )}
           </tbody>
         </table>
+
+        {/* Scroll arrow hint */}
+        {showScrollHint && (
+          <span className="material-symbols-outlined scroll-hint-icon">
+            arrow_downward_alt
+          </span>
+        )}
       </div>
     </div>
   );

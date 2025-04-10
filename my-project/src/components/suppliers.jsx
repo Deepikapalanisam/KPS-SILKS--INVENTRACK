@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import "../styles/styles.css";
 
@@ -11,10 +11,26 @@ function Supplier() {
   const [editedName, setEditedName] = useState("");
   const [editedEmail, setEditedEmail] = useState("");
   const [editedContactNo, setEditedContactNo] = useState("");
+  const [showScrollHint, setShowScrollHint] = useState(false);
+
+  const tableRef = useRef(null);
 
   useEffect(() => {
     fetchSuppliers();
   }, []);
+
+  useEffect(() => {
+    checkTableScroll();
+    window.addEventListener("resize", checkTableScroll);
+    return () => window.removeEventListener("resize", checkTableScroll);
+  }, [suppliers]);
+
+  const checkTableScroll = () => {
+    if (tableRef.current) {
+      const { scrollHeight, clientHeight } = tableRef.current;
+      setShowScrollHint(scrollHeight > clientHeight);
+    }
+  };
 
   const fetchSuppliers = async () => {
     try {
@@ -96,7 +112,7 @@ function Supplier() {
         style={{
           display: "flex",
           flexWrap: "wrap",
-          gap: "20px", // 👈 Increased gap between input fields
+          gap: "20px",
           justifyContent: "center",
           marginBottom: "20px",
         }}
@@ -123,7 +139,7 @@ function Supplier() {
       </form>
 
       <h2 className="title">Supplier List</h2>
-      <div className="table-container">
+      <div className="table-container" ref={tableRef}>
         <table className="table-1">
           <thead>
             <tr>
@@ -143,24 +159,9 @@ function Supplier() {
                 <tr key={supplier._id}>
                   {editMode === supplier._id ? (
                     <>
-                      <td>
-                        <input
-                          value={editedName}
-                          onChange={(e) => setEditedName(e.target.value)}
-                        />
-                      </td>
-                      <td>
-                        <input
-                          value={editedEmail}
-                          onChange={(e) => setEditedEmail(e.target.value)}
-                        />
-                      </td>
-                      <td>
-                        <input
-                          value={editedContactNo}
-                          onChange={(e) => setEditedContactNo(e.target.value)}
-                        />
-                      </td>
+                      <td><input value={editedName} onChange={(e) => setEditedName(e.target.value)} /></td>
+                      <td><input value={editedEmail} onChange={(e) => setEditedEmail(e.target.value)} /></td>
+                      <td><input value={editedContactNo} onChange={(e) => setEditedContactNo(e.target.value)} /></td>
                       <td>
                         <button className="save-btn" onClick={() => handleSaveEdit(supplier._id)}>Save</button>
                         <button className="cancel-btn" onClick={() => setEditMode(null)}>Cancel</button>
@@ -183,6 +184,8 @@ function Supplier() {
           </tbody>
         </table>
       </div>
+
+      {showScrollHint && <div className="scroll-hint-icon">↓</div>}
     </div>
   );
 }
