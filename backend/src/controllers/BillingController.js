@@ -1,6 +1,6 @@
 const Billing = require("../models/Billing");
 
-// Utility to format date to dd-mm-yy (for display only)
+// Utility to format date to dd-mm-yy
 const formatDate = (date) => {
   const d = new Date(date);
   const day = String(d.getDate()).padStart(2, "0");
@@ -12,14 +12,20 @@ const formatDate = (date) => {
 // Create a new bill and store it in the DB
 const createBill = async (req, res) => {
   try {
-    const { name, quantity, price, totalPrice } = req.body;
+    const { name, quantity, price, totalPrice, customerName, mobile } = req.body;
+
+    if (!customerName || !mobile) {
+      return res.status(400).json({ error: "Customer name and mobile are required." });
+    }
 
     const newBill = new Billing({
       name,
       quantity,
       price,
       totalPrice,
-      date: new Date(), // Explicitly setting current date
+      customerName,
+      mobile,
+      date: new Date(),
     });
 
     const savedBill = await newBill.save();

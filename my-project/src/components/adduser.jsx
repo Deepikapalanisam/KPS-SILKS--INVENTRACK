@@ -114,7 +114,7 @@ function AddUser() {
       <form onSubmit={handleAddUser} className="horizontal-form">
         <input
           type="text"
-          placeholder="Username(e.g:name@admin)"
+          placeholder="Username(e.g:name@billdesk)"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />

@@ -1,4 +1,3 @@
-// models/Billing.js
 const mongoose = require("mongoose");
 
 const billingSchema = new mongoose.Schema({
@@ -18,9 +17,17 @@ const billingSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  customerName: {
+    type: String,
+    required: true,
+  },
+  mobile: {
+    type: String,
+    required: true,
+  },
   date: {
     type: Date,
-    default: () => new Date(),  // ✅ Use function for correct timestamp
+    default: () => new Date(),
   },
 });
 
