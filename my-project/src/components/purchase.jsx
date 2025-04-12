@@ -10,7 +10,6 @@ function Purchase() {
   const [pricePerUnit, setPricePerUnit] = useState("");
   const [supplier, setSupplier] = useState("");
   const [category, setCategory] = useState("");
-  const [dateOfPurchase, setDateOfPurchase] = useState("");
   const [showScrollHint, setShowScrollHint] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -53,28 +52,37 @@ function Purchase() {
   const handleAddPurchase = async (e) => {
     e.preventDefault();
 
-    if (!name || !quantity || !pricePerUnit || !supplier || !category || !dateOfPurchase) {
-      alert("All fields including date are required!");
+    const trimmedName = name.trim();
+    const qty = Number(quantity);
+    const price = Number(pricePerUnit);
+    const dateOfPurchase = new Date().toISOString(); // Auto-fill date
+
+    if (!trimmedName || !quantity || !pricePerUnit || !supplier || !category) {
+      alert("All fields are required.");
       return;
     }
 
-    if (isNaN(quantity) || isNaN(pricePerUnit)) {
-      alert("Quantity and Price Per Unit must be valid numbers.");
+    if (isNaN(qty) || qty <= 0) {
+      alert("Quantity must be a positive number.");
+      return;
+    }
+
+    if (isNaN(price) || price <= 0) {
+      alert("Price per unit must be a positive number.");
       return;
     }
 
     try {
       setIsLoading(true);
       const response = await axios.post("http://localhost:5000/purchases/add", {
-        name,
-        quantity: Number(quantity),
-        pricePerUnit: Number(pricePerUnit),
+        name: trimmedName,
+        quantity: qty,
+        pricePerUnit: price,
         supplier,
         category,
-        dateOfPurchase: new Date(dateOfPurchase).toISOString(),
+        dateOfPurchase,
       });
 
-      console.log("Saved purchase:", response.data);
       alert("Purchase added successfully!");
       fetchPurchases();
 
@@ -84,7 +92,6 @@ function Purchase() {
       setPricePerUnit("");
       setSupplier("");
       setCategory("");
-      setDateOfPurchase("");
     } catch (error) {
       console.error("Error adding purchase:", error);
       alert(error.response?.data?.error || "Error adding purchase");
@@ -117,6 +124,7 @@ function Purchase() {
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter product name"
               required
+              minLength={2}
             />
           </div>
 
@@ -140,6 +148,8 @@ function Purchase() {
               onChange={(e) => setQuantity(e.target.value)}
               placeholder="Enter quantity"
               required
+              min="1"
+              step="1"
             />
           </div>
 
@@ -150,6 +160,8 @@ function Purchase() {
               onChange={(e) => setPricePerUnit(e.target.value)}
               placeholder="Enter price"
               required
+              min="0.01"
+              step="0.01"
             />
           </div>
 
@@ -168,16 +180,11 @@ function Purchase() {
             </select>
           </div>
 
-          <div className="input-group">
-            <input
-              type="date"
-              value={dateOfPurchase}
-              onChange={(e) => setDateOfPurchase(e.target.value)}
-              required
-            />
-          </div>
-
-          <button type="submit" className="save-btn" disabled={isLoading}>
+          <button
+            type="submit"
+            className="save-btn"
+            disabled={isLoading}
+          >
             {isLoading ? "Saving..." : "Save"}
           </button>
         </div>

@@ -46,16 +46,40 @@ function Supplier() {
 
   const handleAddSupplier = async (e) => {
     e.preventDefault();
-    if (!name || !email || !contactNo) return alert("All fields are required!");
-    if (!emailRegex.test(email)) return alert("Invalid email format!");
-    if (!mobileRegex.test(contactNo)) return alert("Contact number must be exactly 10 digits!");
+    const trimmedName = name.trim();
+    const trimmedEmail = email.trim();
+    const trimmedContactNo = contactNo.trim();
 
-    if (suppliers.some(s => s.name.toLowerCase() === name.toLowerCase())) return alert("Supplier name already exists!");
-    if (suppliers.some(s => s.email === email)) return alert("Email already exists!");
-    if (suppliers.some(s => s.contactNo === contactNo)) return alert("Contact number already exists!");
+    if (!trimmedName || !trimmedEmail || !trimmedContactNo) {
+      return alert("All fields are required!");
+    }
+
+    if (!emailRegex.test(trimmedEmail)) {
+      return alert("Invalid email format!");
+    }
+
+    if (!mobileRegex.test(trimmedContactNo)) {
+      return alert("Contact number must be exactly 10 digits!");
+    }
+
+    if (suppliers.some(s => s.name.toLowerCase() === trimmedName.toLowerCase())) {
+      return alert("Supplier name already exists!");
+    }
+
+    if (suppliers.some(s => s.email.toLowerCase() === trimmedEmail.toLowerCase())) {
+      return alert("Email already exists!");
+    }
+
+    if (suppliers.some(s => s.contactNo === trimmedContactNo)) {
+      return alert("Contact number already exists!");
+    }
 
     try {
-      await axios.post("http://localhost:5000/suppliers", { name, email, contactNo });
+      await axios.post("http://localhost:5000/suppliers", {
+        name: trimmedName,
+        email: trimmedEmail,
+        contactNo: trimmedContactNo
+      });
       setName(""); setEmail(""); setContactNo("");
       fetchSuppliers();
     } catch (error) {
@@ -71,19 +95,39 @@ function Supplier() {
   };
 
   const handleSaveEdit = async (id) => {
-    if (!editedName || !editedEmail || !editedContactNo) return alert("Fields cannot be empty!");
-    if (!emailRegex.test(editedEmail)) return alert("Invalid email format!");
-    if (!mobileRegex.test(editedContactNo)) return alert("Contact number must be exactly 10 digits!");
+    const trimmedName = editedName.trim();
+    const trimmedEmail = editedEmail.trim();
+    const trimmedContactNo = editedContactNo.trim();
 
-    if (suppliers.some(s => s.name.toLowerCase() === editedName.toLowerCase() && s._id !== id)) return alert("Supplier name already exists!");
-    if (suppliers.some(s => s.email === editedEmail && s._id !== id)) return alert("Email already exists!");
-    if (suppliers.some(s => s.contactNo === editedContactNo && s._id !== id)) return alert("Contact number already exists!");
+    if (!trimmedName || !trimmedEmail || !trimmedContactNo) {
+      return alert("Fields cannot be empty!");
+    }
+
+    if (!emailRegex.test(trimmedEmail)) {
+      return alert("Invalid email format!");
+    }
+
+    if (!mobileRegex.test(trimmedContactNo)) {
+      return alert("Contact number must be exactly 10 digits!");
+    }
+
+    if (suppliers.some(s => s.name.toLowerCase() === trimmedName.toLowerCase() && s._id !== id)) {
+      return alert("Supplier name already exists!");
+    }
+
+    if (suppliers.some(s => s.email.toLowerCase() === trimmedEmail.toLowerCase() && s._id !== id)) {
+      return alert("Email already exists!");
+    }
+
+    if (suppliers.some(s => s.contactNo === trimmedContactNo && s._id !== id)) {
+      return alert("Contact number already exists!");
+    }
 
     try {
       await axios.put(`http://localhost:5000/suppliers/${id}`, {
-        name: editedName,
-        email: editedEmail,
-        contactNo: editedContactNo,
+        name: trimmedName,
+        email: trimmedEmail,
+        contactNo: trimmedContactNo,
       });
       setEditMode(null);
       fetchSuppliers();
@@ -105,7 +149,6 @@ function Supplier() {
   return (
     <div className="container">
       <h2 className="gradient-heading">Add Supplier</h2>
-
       <form onSubmit={handleAddSupplier} className="horizontal-form">
         <input
           type="text"
@@ -129,7 +172,6 @@ function Supplier() {
       </form>
 
       <h2 className="gradient-heading">Supplier List</h2>
-
       <div className="table-container relative" ref={tableRef}>
         <table className="table-1">
           <thead>

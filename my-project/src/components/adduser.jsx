@@ -43,7 +43,11 @@ function AddUser() {
 
   const handleAddUser = async (e) => {
     e.preventDefault();
-    if (!username || !password) return alert("All fields are required!");
+
+    // Input validation
+    if (!username || !password) {
+      return alert("All fields are required!");
+    }
 
     if (!usernameRegex.test(username)) {
       alert("Invalid username! Use only alphabets followed by @admin or @billdesk.");
@@ -72,7 +76,10 @@ function AddUser() {
   };
 
   const handleSaveEdit = async (id) => {
-    if (!editedUsername || !editedPassword) return alert("Fields cannot be empty!");
+    // Input validation
+    if (!editedUsername || !editedPassword) {
+      return alert("Fields cannot be empty!");
+    }
 
     if (!usernameRegex.test(editedUsername)) {
       alert("Invalid username! Use only alphabets followed by @admin or @billdesk.");

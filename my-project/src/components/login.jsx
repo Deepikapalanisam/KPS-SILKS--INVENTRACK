@@ -63,7 +63,7 @@ export default function Login() {
 
       <div className="form-section">
         <div className="login-box">
-          <h2 className="gradient-heading">Welcome Back!</h2>
+          <h2 className="gradient-heading">WELCOME TO KPS SILKS!</h2>
           <p className="subtitle">
             Please log in to continue managing your inventory with Inventrack.
           </p>

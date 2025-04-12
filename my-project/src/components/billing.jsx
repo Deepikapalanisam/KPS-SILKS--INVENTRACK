@@ -61,14 +61,13 @@ const Billing = () => {
   };
 
   const handlePriceChange = (e) => {
-    const price = parseFloat(e.target.value) || 0;
+    const price = parseFloat(e.target.value) || 0; // Ensure the price is a number
     setFormData(prev => ({
       ...prev,
       price,
       totalPrice: price * prev.quantity,
     }));
   };
-
   const handleMobileChange = (e) => {
     const input = e.target.value.replace(/\D/g, "");
     if (input.length <= 10) {
@@ -76,21 +75,50 @@ const Billing = () => {
     }
   };
 
-  const handleAddItem = () => {
-    if (!formData.name || !formData.quantity || !formData.price) {
-      alert("Fill in item, quantity, and price");
-      return;
+const handleAddItem = () => {
+  const { name, quantity, price } = formData;
+  const { customerName, mobile } = customerInfo;
+  const selectedStock = stockData.find(item => item.name === name);
+  
+  if (!name || !quantity || !price || !customerName || !mobile) {
+    alert("All fields are required.");
+    return;
+  }
+  
+  if (quantity <= 0) {
+    alert("Quantity must be greater than 0.");
+    return;
+  }
+  
+  if (!selectedStock) {
+    alert("Selected item not found in stock.");
+    return;
+  }
+  
+  if (quantity > selectedStock.quantity) {
+    alert(`Insufficient stock for "${name}". Available: ${selectedStock.quantity}`);
+    return;
+  }
+  
+  // Passed all validations
+  setProductList(prev => [
+    ...prev,
+    {
+      ...formData,
+      customerName,
+      mobile,
     }
+  ]);
+  
+  setSelectedItem("");
+  setFormData({
+    name: "",
+    quantity: "",
+    price: "",
+    totalPrice: 0,
+  });
+};
 
-    setProductList(prev => [...prev, { ...formData }]);
-    setSelectedItem("");
-    setFormData({
-      name: "",
-      quantity: "",
-      price: "",
-      totalPrice: 0,
-    });
-  };
 
   const handleDownloadPDF = async () => {
     const { customerName, mobile } = customerInfo;
@@ -182,7 +210,7 @@ const Billing = () => {
       alert("Error generating bill.");
     }
   };
-  
+
   return (
     <div className="container">
       <h2 className="gradient-heading">Billing Section</h2>
@@ -209,9 +237,13 @@ const Billing = () => {
               placeholder="Quantity" />
           </div>
           <div className="input-group">
-            <input type="number" step="0.01" value={formData.price} onChange={handlePriceChange}
-              placeholder="Price" />
-          </div>
+  <input 
+    type="text" 
+    value={formData.price} 
+    onChange={handlePriceChange}
+    placeholder="Price" 
+  />
+</div>
           <div className="input-group">
             <input type="text" value={formData.totalPrice.toFixed(2)} readOnly />
           </div>
