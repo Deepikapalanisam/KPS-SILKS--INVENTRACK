@@ -25,12 +25,20 @@ const Billing = () => {
   const [showScrollHint, setShowScrollHint] = useState(false);
 
   useEffect(() => {
+    fetchStockData();
+    fetchBillingDetails();
+  }, []);
+
+  const fetchStockData = () => {
     axios.get("http://localhost:5000/stock").then(res => setStockData(res.data));
+  };
+
+  const fetchBillingDetails = () => {
     axios.get("http://localhost:5000/billing").then(res => {
       setBillingDetails(res.data);
       setTimeout(checkScrollHint, 100);
     });
-  }, []);
+  };
 
   const checkScrollHint = () => {
     const el = tableRef.current;
@@ -77,12 +85,39 @@ const Billing = () => {
   };
 
   const handleAddItem = () => {
-    if (!formData.name || !formData.quantity || !formData.price) {
-      alert("Fill in item, quantity, and price");
+    const { name, quantity, price } = formData;
+    const { customerName, mobile } = customerInfo;
+    const selectedStock = stockData.find(item => item.name === name);
+    
+    if (!name || !quantity || !price || !customerName || !mobile) {
+      alert("All fields are required.");
       return;
     }
-
-    setProductList(prev => [...prev, { ...formData }]);
+    
+    if (quantity <= 0) {
+      alert("Quantity must be greater than 0.");
+      return;
+    }
+    
+    if (!selectedStock) {
+      alert("Selected item not found in stock.");
+      return;
+    }
+    
+    if (quantity > selectedStock.quantity) {
+      alert(`Insufficient stock for "${name}". Available: ${selectedStock.quantity}`);
+      return;
+    }
+    
+    setProductList(prev => [
+      ...prev,
+      {
+        ...formData,
+        customerName,
+        mobile,
+      }
+    ]);
+    
     setSelectedItem("");
     setFormData({
       name: "",
@@ -92,78 +127,84 @@ const Billing = () => {
     });
   };
 
+  const generatePDF = () => {
+    const { customerName, mobile } = customerInfo;
+    const date = new Date().toISOString().split("T")[0];
+    const doc = new jsPDF();
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(22);
+    doc.text("KPS SILKS", 20, 20);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text("415 Uthukuli Road,", 20, 28);
+    doc.text("Kunnnathur, Tamil Nadu - 638103", 20, 33);
+
+    doc.setFontSize(12);
+    doc.text(`Date: ${date}`, 150, 20, { align: "right" });
+
+    doc.text(`Customer Name : ${customerName}`, 20, 45);
+    doc.text(`Mobile Number : +91 ${mobile}`, 20, 50);
+
+    doc.text("-------------------------------------------------------------", 20, 55);
+
+    let y = 65;
+    let grandTotal = 0;
+
+    productList.forEach((item, idx) => {
+      doc.text(`${idx + 1}) Product: ${item.name}`, 20, y);
+      doc.text(`Qty: ${item.quantity}, Price: Rs. ${item.price.toFixed(2)}`, 30, y + 7);
+      doc.text(`Total: Rs. ${item.totalPrice.toFixed(2)}`, 30, y + 14);
+      grandTotal += item.totalPrice;
+      y += 20;
+    });
+
+    doc.text("-------------------------------------------------------------", 20, y);
+    doc.setFont("helvetica", "bold");
+    doc.text(`Grand Total: Rs. ${grandTotal.toFixed(2)}`, 20, y + 10);
+    doc.setFont("helvetica", "normal");
+    doc.text("Thank you for your purchase!", 20, y + 20);
+
+    return doc;
+  };
+
   const handleDownloadPDF = async () => {
     const { customerName, mobile } = customerInfo;
     const date = new Date().toISOString().split("T")[0];
-  
+
     if (!customerName || !/^\d{10}$/.test(mobile) || productList.length === 0) {
       alert("Fill customer details and add at least one item.");
       return;
     }
-  
-    const billNo = billingDetails.length + 1;
-  
+
     try {
-      const doc = new jsPDF();
-  
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(22);
-      doc.text("KPS SILKS", 20, 20);
-  
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(10);
-      doc.text("415 Uthukuli Road,", 20, 28);
-      doc.text("Kunnnathur, Tamil Nadu - 638103", 20, 33);
-  
-      doc.setFontSize(12);
-      doc.text(`Date: ${date}`, 150, 20, { align: "right" });
-      doc.text(`Bill No: ${billNo}`, 150, 28, { align: "right" });
-  
-      doc.text(`Customer Name : ${customerName}`, 20, 45);
-      doc.text(`Mobile Number : +91 ${mobile}`, 20, 50);
-  
-      doc.text("-------------------------------------------------------------", 20, 55);
-  
-      let y = 65;
-      let grandTotal = 0;
-  
-      productList.forEach((item, idx) => {
-        doc.text(`${idx + 1}) Product: ${item.name}`, 20, y);
-        doc.text(`Qty: ${item.quantity}, Price: Rs. ${item.price.toFixed(2)}`, 30, y + 7);
-        doc.text(`Total: Rs. ${item.totalPrice.toFixed(2)}`, 30, y + 14);
-        grandTotal += item.totalPrice;
-        y += 20;
-      });
-  
-      doc.text("-------------------------------------------------------------", 20, y);
-      doc.setFont("helvetica", "bold");
-      doc.text(`Grand Total: Rs. ${grandTotal.toFixed(2)}`, 20, y + 10);
-      doc.setFont("helvetica", "normal");
-      doc.text("Thank you for your purchase!", 20, y + 20);
-  
-      doc.save(`bill_${billNo}_${customerName}_${date}.pdf`);
-  
+      // First update stock
       for (const item of productList) {
         const stockItem = stockData.find(s => s.name === item.name);
         if (!stockItem || stockItem.quantity < item.quantity) {
           alert(`Insufficient stock for ${item.name}`);
           return;
         }
-  
         await axios.put(`http://localhost:5000/stock/${stockItem._id}`, {
           quantity: stockItem.quantity - item.quantity,
         });
-  
-        await axios.post("http://localhost:5000/billing", {
-          ...item,
-          customerName,
-          mobile,
-          date,
-        });
       }
-  
-      const newBillings = await axios.get("http://localhost:5000/billing");
-      setBillingDetails(newBillings.data);
+
+      // Create bill in database
+      await axios.post("http://localhost:5000/billing", {
+        customerName,
+        mobile,
+        items: productList,
+        date,
+        grandTotal: productList.reduce((sum, item) => sum + item.totalPrice, 0)
+      });
+
+      // Generate and save PDF
+      const doc = generatePDF();
+      doc.save(`bill_${customerName}_${date}.pdf`);
+
+      // Reset form
       setProductList([]);
       setFormData({
         name: "",
@@ -175,26 +216,81 @@ const Billing = () => {
         customerName: "",
         mobile: "",
       });
-      alert("Bill saved and downloaded!");
-      setTimeout(checkScrollHint, 100);
+
+      // Refresh data
+      fetchStockData();
+      fetchBillingDetails();
+      
+      alert("Bill generated successfully!");
     } catch (err) {
       console.error("Billing Error:", err);
       alert("Error generating bill.");
     }
   };
-  
+
+  const openBillPDF = (bill) => {
+    const doc = new jsPDF();
+    
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(22);
+    doc.text("KPS SILKS", 20, 20);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text("415 Uthukuli Road,", 20, 28);
+    doc.text("Kunnnathur, Tamil Nadu - 638103", 20, 33);
+
+    doc.setFontSize(12);
+    doc.text(`Date: ${bill.date}`, 150, 20, { align: "right" });
+
+    doc.text(`Customer Name : ${bill.customerName}`, 20, 45);
+    doc.text(`Mobile Number : +91 ${bill.mobile}`, 20, 50);
+
+    doc.text("-------------------------------------------------------------", 20, 55);
+
+    let y = 65;
+    let grandTotal = 0;
+
+    bill.items.forEach((item, idx) => {
+      doc.text(`${idx + 1}) Product: ${item.name}`, 20, y);
+      doc.text(`Qty: ${item.quantity}, Price: Rs. ${item.price.toFixed(2)}`, 30, y + 7);
+      doc.text(`Total: Rs. ${item.totalPrice.toFixed(2)}`, 30, y + 14);
+      grandTotal += item.totalPrice;
+      y += 20;
+    });
+
+    doc.text("-------------------------------------------------------------", 20, y);
+    doc.setFont("helvetica", "bold");
+    doc.text(`Grand Total: Rs. ${grandTotal.toFixed(2)}`, 20, y + 10);
+    doc.setFont("helvetica", "normal");
+    doc.text("Thank you for your purchase!", 20, y + 20);
+
+    // Open PDF in new tab
+    const pdfBlob = doc.output('blob');
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+    window.open(pdfUrl, '_blank');
+  };
+
   return (
     <div className="container">
       <h2 className="gradient-heading">Billing Section</h2>
       <form className="form">
         <div className="filter-form">
           <div className="input-group">
-            <input type="text" placeholder="Customer Name" value={customerInfo.customerName}
-              onChange={(e) => setCustomerInfo(prev => ({ ...prev, customerName: e.target.value }))} />
+            <input 
+              type="text" 
+              placeholder="Customer Name" 
+              value={customerInfo.customerName}
+              onChange={(e) => setCustomerInfo(prev => ({ ...prev, customerName: e.target.value }))} 
+            />
           </div>
           <div className="input-group">
-            <input type="tel" placeholder="Mobile Number" value={customerInfo.mobile}
-              onChange={handleMobileChange} />
+            <input 
+              type="tel" 
+              placeholder="Mobile Number" 
+              value={customerInfo.mobile}
+              onChange={handleMobileChange} 
+            />
           </div>
           <div className="input-group">
             <select value={selectedItem} onChange={handleItemChange}>
@@ -205,15 +301,28 @@ const Billing = () => {
             </select>
           </div>
           <div className="input-group">
-            <input type="number" min="1" value={formData.quantity} onChange={handleQuantityChange}
-              placeholder="Quantity" />
+            <input 
+              type="number" 
+              min="1" 
+              value={formData.quantity} 
+              onChange={handleQuantityChange}
+              placeholder="Quantity" 
+            />
           </div>
           <div className="input-group">
-            <input type="number" step="0.01" value={formData.price} onChange={handlePriceChange}
-              placeholder="Price" />
+            <input 
+              type="text" 
+              value={formData.price} 
+              onChange={handlePriceChange}
+              placeholder="Price" 
+            />
           </div>
           <div className="input-group">
-            <input type="text" value={formData.totalPrice.toFixed(2)} readOnly />
+            <input 
+              type="text" 
+              value={formData.totalPrice.toFixed(2)} 
+              readOnly 
+            />
           </div>
           <button type="button" className="save-btn" onClick={handleAddItem}>Add Item</button>
           <button type="button" className="save-btn" onClick={handleDownloadPDF}>Generate Bill</button>
@@ -226,7 +335,10 @@ const Billing = () => {
           <table className="table-1">
             <thead>
               <tr>
-                <th>Item</th><th>Qty</th><th>Price</th><th>Total</th>
+                <th>Item</th>
+                <th>Qty</th>
+                <th>Price</th>
+                <th>Total</th>
               </tr>
             </thead>
             <tbody>
@@ -247,8 +359,11 @@ const Billing = () => {
         <table className="table-1">
           <thead>
             <tr>
-              <th>Customer</th><th>Mobile</th><th>Item</th><th>Quantity</th>
-              <th>Price</th><th>Date</th><th>Total</th>
+              <th>Customer</th>
+              <th>Mobile</th>
+              <th>Date</th>
+              <th>Total</th>
+              <th>Bill</th>
             </tr>
           </thead>
           <tbody>
@@ -256,15 +371,20 @@ const Billing = () => {
               <tr key={index}>
                 <td>{bill.customerName}</td>
                 <td>+91 {bill.mobile}</td>
-                <td>{bill.name}</td>
-                <td>{bill.quantity}</td>
-                <td>₹{parseFloat(bill.price).toFixed(2)}</td>
                 <td>{bill.date}</td>
-                <td>₹{parseFloat(bill.totalPrice).toFixed(2)}</td>
+                <td>₹{parseFloat(bill.grandTotal).toFixed(2)}</td>
+                <td>
+                  <button 
+                    className="view-btn"
+                    onClick={() => openBillPDF(bill)}
+                  >
+                    View Bill
+                  </button>
+                </td>
               </tr>
             )) : (
               <tr>
-                <td colSpan="7" className="no-records">No billing records found.</td>
+                <td colSpan="5" className="no-records">No billing records found.</td>
               </tr>
             )}
           </tbody>

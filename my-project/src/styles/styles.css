@@ -5,8 +5,8 @@ html, body {
   padding: 0;
   overflow-x: hidden;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f0f2f5;
-  color: #1f2a40;
+  background-color: #f9fafb;
+  color: #1e293b;
 }
 
 /* Sidebar-aware layout */
@@ -31,7 +31,7 @@ html, body {
   text-align: center;
   font-size: 28px;
   font-weight: bold;
-  color: #0d47a1;
+  color: #1d4ed8;
   margin-bottom: 20px;
 }
 
@@ -39,7 +39,7 @@ html, body {
   font-family: 'Special Gothic Expanded One', sans-serif;
   font-size: 2.5rem;
   font-weight: 800;
-  background: linear-gradient(to right, #2563eb, #9333ea, #ec4899);
+  background: linear-gradient(to right, #2563eb, #7c3aed, #ec4899);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: 10px;
@@ -51,10 +51,10 @@ input,
 select {
   padding: 10px;
   font-size: 16px;
-  border: 1px solid #b0bec5;
+  border: 1px solid #cbd5e1;
   border-radius: 6px;
   background-color: #ffffff;
-  color: #1f2a40;
+  color: #1e293b;
   transition: border 0.3s, box-shadow 0.3s;
   box-sizing: border-box;
   min-width: 250px;
@@ -64,8 +64,8 @@ select {
 
 input:focus,
 select:focus {
-  border-color: #42a5f5;
-  box-shadow: 0 0 8px rgba(66, 165, 245, 0.3);
+  border-color: #3b82f6;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.3);
   outline: none;
 }
 
@@ -81,13 +81,13 @@ select:focus {
   left: 10px;
   transform: translateY(-50%);
   font-size: 22px;
-  color: #90a4ae;
+  color: #94a3b8;
   pointer-events: none;
 }
 
 .input-wrapper input,
 .input-wrapper select {
-  padding-left: 30px; /* Adding space for the icon */
+  padding-left: 30px;
 }
 
 /* Filter Form Layout */
@@ -112,7 +112,7 @@ select:focus {
 .horizontal-form input,
 .horizontal-form select {
   padding: 10px;
-  border: 1px solid #ccc;
+  border: 1px solid #d1d5db;
   border-radius: 8px;
   min-width: 250px;
   font-size: 14px;
@@ -144,17 +144,38 @@ button,
   transition: background-color 0.3s ease;
 }
 
-.save-btn { background-color: #1976d2; color: white; }
-.save-btn:hover { background-color: #1565c0; }
+.save-btn {
+  background-color: #2563eb;
+  color: white;
+}
+.save-btn:hover {
+  background-color: #1e40af;
+}
 
-.delete-btn { background-color: #e53935; color: white; }
-.delete-btn:hover { background-color: #c62828; }
+.delete-btn {
+  background-color: #dc2626;
+  color: white;
+}
+.delete-btn:hover {
+  background-color: #b91c1c;
+}
 
-.edit-btn { background-color: #ffb300; color: white; margin-right: 12px; }
-.edit-btn:hover { background-color: #ffa000; }
+.edit-btn {
+  background-color: #f59e0b;
+  color: white;
+  margin-right: 12px;
+}
+.edit-btn:hover {
+  background-color: #d97706;
+}
 
-.cancel-btn { background-color: #90a4ae; color: white; }
-.cancel-btn:hover { background-color: #78909c; }
+.cancel-btn {
+  background-color: #94a3b8;
+  color: white;
+}
+.cancel-btn:hover {
+  background-color: #64748b;
+}
 
 /* Tables */
 table {
@@ -163,23 +184,23 @@ table {
   background-color: #ffffff;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
 }
 
 th, td {
   padding: 12px 16px;
   text-align: left;
-  border-bottom: 1px solid #eceff1;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 th {
-  background-color: #e3f2fd;
-  color: #0d47a1;
+  background-color: #e0f2fe;
+  color: #1e3a8a;
   font-weight: 600;
 }
 
 td {
-  color: #37474f;
+  color: #334155;
 }
 
 .table-1 {
@@ -195,7 +216,7 @@ td {
   text-align: center;
   padding: 20px 0;
   font-style: italic;
-  color: #90a4ae;
+  color: #94a3b8;
 }
 
 /* Scrollable container */
@@ -205,7 +226,7 @@ td {
   max-height: 500px;
   width: 100%;
   border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
   position: relative;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -223,7 +244,7 @@ td {
   transform: translateX(-50%);
   font-size: 22px;
   color: white;
-  background-color: #0a2c66;
+  background-color: #1e3a8a;
   border-radius: 50px;
   padding: 2px 4px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
@@ -239,12 +260,42 @@ td {
 
 /* Special row coloring */
 .critical {
-  background-color: #ffebee;
-  color: #c62828;
+  background-color: #fee2e2;
+  color: #b91c1c;
   font-weight: bold;
 }
 
 .warning {
-  background-color: #fff8e1;
-  color: #f57f17;
+  background-color: #fef9c3;
+  color: #b45309;
+}
+
+/* View Button */
+.view-btn {
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #2563eb, #38bdf8);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+.view-btn:hover {
+  background: linear-gradient(135deg, #1d4ed8, #0ea5e9);
+  box-shadow: 0 3px 6px rgba(59, 130, 246, 0.4);
+}
+
+.view-btn:active {
+  background: linear-gradient(135deg, #1e40af, #0284c7);
+  transform: translateY(1px);
+  box-shadow: 0 1px 3px rgba(59, 130, 246, 0.4);
+}
+
+.view-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
 }
