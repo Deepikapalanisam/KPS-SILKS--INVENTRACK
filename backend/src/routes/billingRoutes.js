@@ -6,11 +6,16 @@ const {
   getBillPDF
 } = require('../controllers/BillingController');
 
+
 // Create new bill
 router.post('/', createBill);
 
 // Get all bills
 router.get('/', getAllBills);
+router.post("/", createBill);
+
+router.get("/", getAllBills);
+
 
 // Get PDF for specific bill
 router.get('/:id/pdf', getBillPDF);

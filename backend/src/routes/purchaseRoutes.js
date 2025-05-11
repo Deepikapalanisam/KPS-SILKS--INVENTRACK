@@ -4,6 +4,6 @@ const { addPurchase, getPurchases, deletePurchase } = require('../controllers/pu
 
 router.post('/add', addPurchase);
 router.get('/', getPurchases);
-router.delete('/:id', deletePurchase); // DELETE route
+router.delete('/:id', deletePurchase);
 
 module.exports = router;
