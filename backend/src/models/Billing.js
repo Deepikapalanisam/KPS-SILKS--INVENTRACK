@@ -22,11 +22,11 @@ const billingSchema = new mongoose.Schema({
   items: { type: [itemSchema], required: true },
   grandTotal: { type: Number, required: true, min: 0 },
   date: {
-    type: Date,
+    type: String,  // Changed from Date to String
     required: true,
     default: () => {
       const now = new Date();
-      return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      return now.toISOString().split('T')[0]; // Stores only YYYY-MM-DD
     }
   }
 });
