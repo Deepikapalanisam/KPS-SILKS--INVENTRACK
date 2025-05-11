@@ -8,7 +8,6 @@ const itemSchema = new mongoose.Schema({
 });
 
 const billingSchema = new mongoose.Schema({
-  billNo: { type: Number, required: true },
   customerName: { type: String, required: true },
   mobile: {
     type: String,
@@ -32,20 +31,6 @@ const billingSchema = new mongoose.Schema({
   }
 });
 
-// Auto-increment billNo based on date
-billingSchema.pre('save', async function(next) {
-  if (this.isNew) {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    const lastBill = await this.constructor.findOne({
-      date: today
-    }).sort({ billNo: -1 });
-    
-    this.billNo = lastBill ? lastBill.billNo + 1 : 1;
-    this.date = today;
-  }
-  next();
-});
+// Removed the billNo pre-save hook completely
 
 module.exports = mongoose.model('Billing', billingSchema);

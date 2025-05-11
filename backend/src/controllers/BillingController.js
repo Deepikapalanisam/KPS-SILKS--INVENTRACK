@@ -1,6 +1,5 @@
-const { MongoClient } = require("mongodb");
-const jsPDF = require("jspdf");
 const Billing = require("../models/Billing");
+const { jsPDF } = require("jspdf"); // Updated import
 
 // Utility to format date to dd-mm-yy
 const formatDate = (date) => {
@@ -13,8 +12,8 @@ const formatDate = (date) => {
 
 // Generate PDF using jsPDF
 const generatePDF = (billData) => {
-  const doc = new jsPDF();
-  const { customerName, mobile, items, grandTotal, date, billNo } = billData;
+  const doc = new jsPDF(); // Now should work correctly
+  const { customerName, mobile, items, grandTotal, date } = billData;
 
   doc.setFont("helvetica", "bold");
   doc.setFontSize(22);
@@ -27,7 +26,6 @@ const generatePDF = (billData) => {
 
   doc.setFontSize(12);
   doc.text(`Date: ${formatDate(date)}`, 150, 20, { align: "right" });
-  doc.text(`Bill No: ${billNo}`, 150, 28, { align: "right" });
 
   doc.text(`Customer Name : ${customerName}`, 20, 45);
   doc.text(`Mobile Number : +91 ${mobile}`, 20, 50);
@@ -71,17 +69,12 @@ const createBill = async (req, res) => {
 
     const grandTotal = processedItems.reduce((sum, item) => sum + item.totalPrice, 0);
 
-    // Get the next bill number
-    const lastBill = await Billing.findOne().sort({ billNo: -1 });
-    const billNo = lastBill ? lastBill.billNo + 1 : 1;
-
     const newBill = new Billing({
-      billNo,
       customerName,
       mobile,
       items: processedItems,
-      grandTotal,
-      date: new Date()
+      grandTotal
+      // Date will be automatically added by the schema default
     });
 
     const savedBill = await newBill.save();
@@ -90,7 +83,7 @@ const createBill = async (req, res) => {
     res.status(201).json({
       message: "Bill created successfully",
       bill: savedBill,
-      pdf: pdfBuffer.toString("base64") // Send PDF as base64 string
+      pdf: pdfBuffer.toString("base64")
     });
   } catch (err) {
     console.error("Error creating bill:", err);
@@ -98,10 +91,10 @@ const createBill = async (req, res) => {
   }
 };
 
-// Get all bills
+// Get all bills sorted by date (newest first)
 const getAllBills = async (req, res) => {
   try {
-    const bills = await Billing.find().sort({ billNo: -1 });
+    const bills = await Billing.find().sort({ date: -1 });
     res.status(200).json(bills);
   } catch (err) {
     console.error("Error fetching bills:", err);
@@ -122,7 +115,7 @@ const getBillPDF = async (req, res) => {
     const pdfBuffer = generatePDF(bill.toObject());
     
     res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", `attachment; filename=bill_${bill.billNo}.pdf`);
+    res.setHeader("Content-Disposition", `attachment; filename=bill_${bill._id}.pdf`);
     res.send(Buffer.from(pdfBuffer));
   } catch (err) {
     console.error("Error generating bill PDF:", err);
