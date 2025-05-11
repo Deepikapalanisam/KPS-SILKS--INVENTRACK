@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const itemSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -8,10 +8,10 @@ const itemSchema = new mongoose.Schema({
 });
 
 const billingSchema = new mongoose.Schema({
-  billNo: { type: Number, required: true, unique: true },
+  billNo: { type: Number, required: true },
   customerName: { type: String, required: true },
-  mobile: { 
-    type: String, 
+  mobile: {
+    type: String,
     required: true,
     validate: {
       validator: function(v) {
@@ -22,30 +22,30 @@ const billingSchema = new mongoose.Schema({
   },
   items: { type: [itemSchema], required: true },
   grandTotal: { type: Number, required: true, min: 0 },
-  date: { type: Date, default: Date.now }
+  date: {
+    type: Date,
+    required: true,
+    default: () => {
+      const now = new Date();
+      return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    }
+  }
 });
 
-// Auto-increment billNo
-billingSchema.pre("save", async function(next) {
+// Auto-increment billNo based on date
+billingSchema.pre('save', async function(next) {
   if (this.isNew) {
-    const lastBill = await this.constructor.findOne().sort({ billNo: -1 });
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const lastBill = await this.constructor.findOne({
+      date: today
+    }).sort({ billNo: -1 });
+    
     this.billNo = lastBill ? lastBill.billNo + 1 : 1;
+    this.date = today;
   }
   next();
 });
 
-module.exports = mongoose.model("Billing", billingSchema);
-
-const billingSchema = new mongoose.Schema({
-  name: {type: String,required: true,},
-  quantity: {type: Number,required: true,},
-  price: { type: Number,required: true,},
-  totalPrice: {type: Number,required: true,},
-  customerName: {type: String,required: true,},
-  mobile: {type: String, required: true,},
-  date: {type: Date,default: () => new Date(),},
-});
-
-module.exports = mongoose.model("Billing", billingSchema);
-
- 
+module.exports = mongoose.model('Billing', billingSchema);

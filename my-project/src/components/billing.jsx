@@ -69,13 +69,14 @@ const Billing = () => {
   };
 
   const handlePriceChange = (e) => {
-    const price = parseFloat(e.target.value) || 0; // Ensure the price is a number
+    const price = parseFloat(e.target.value) || 0;
     setFormData(prev => ({
       ...prev,
       price,
       totalPrice: price * prev.quantity,
     }));
   };
+
   const handleMobileChange = (e) => {
     const input = e.target.value.replace(/\D/g, "");
     if (input.length <= 10) {
@@ -125,51 +126,6 @@ const Billing = () => {
       totalPrice: 0,
     });
   };
-
-const handleAddItem = () => {
-  const { name, quantity, price } = formData;
-  const { customerName, mobile } = customerInfo;
-  const selectedStock = stockData.find(item => item.name === name);
-  
-  if (!name || !quantity || !price || !customerName || !mobile) {
-    alert("All fields are required.");
-    return;
-  }
-  
-  if (quantity <= 0) {
-    alert("Quantity must be greater than 0.");
-    return;
-  }
-  
-  if (!selectedStock) {
-    alert("Selected item not found in stock.");
-    return;
-  }
-  
-  if (quantity > selectedStock.quantity) {
-    alert(`Insufficient stock for "${name}". Available: ${selectedStock.quantity}`);
-    return;
-  }
-  
-  // Passed all validations
-  setProductList(prev => [
-    ...prev,
-    {
-      ...formData,
-      customerName,
-      mobile,
-    }
-  ]);
-  
-  setSelectedItem("");
-  setFormData({
-    name: "",
-    quantity: "",
-    price: "",
-    totalPrice: 0,
-  });
-};
-
 
   const generatePDF = () => {
     const { customerName, mobile } = customerInfo;
@@ -272,7 +228,6 @@ const handleAddItem = () => {
     }
   };
 
-
   const openBillPDF = (bill) => {
     const doc = new jsPDF();
     
@@ -315,7 +270,6 @@ const handleAddItem = () => {
     const pdfUrl = URL.createObjectURL(pdfBlob);
     window.open(pdfUrl, '_blank');
   };
-
 
   return (
     <div className="container">
@@ -363,13 +317,6 @@ const handleAddItem = () => {
               placeholder="Price" 
             />
           </div>
-  <input 
-    type="text" 
-    value={formData.price} 
-    onChange={handlePriceChange}
-    placeholder="Price" 
-  />
-</div>
           <div className="input-group">
             <input 
               type="text" 
