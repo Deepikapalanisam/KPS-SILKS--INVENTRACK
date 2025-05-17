@@ -299,7 +299,7 @@ const Billing = () => {
     // Grand Total
   doc.setFont("helvetica", "bold");
   doc.text(`Grand Total: Rs. ${grandTotal.toFixed(2)}`, 195, y + 10, { align: "right" });
-
+  
     // Footer
     doc.setFont("helvetica", "normal");
     doc.setFontSize(12);
