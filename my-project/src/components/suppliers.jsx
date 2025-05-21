@@ -198,7 +198,7 @@ function Supplier() {
         />
         <input
           type="text"
-          placeholder="Contact No (10 digits)"
+          placeholder="Contact No"
           value={contactNo}
           onChange={(e) => handleContactNoChange(e, setContactNo)}
           maxLength="10"

@@ -360,6 +360,9 @@ const Billing = () => {
             <input
               type="number"
               min="1"
+                onKeyDown={(e) => {
+    if (["e", "E", "+", "-"].includes(e.key)) e.preventDefault();
+  }}
               placeholder="Quantity"
               value={formData.quantity}
               onChange={handleQuantityChange}
@@ -370,6 +373,9 @@ const Billing = () => {
             <input
               type="number"
               step="0.01"
+                onKeyDown={(e) => {
+    if (["e", "E", "+", "-"].includes(e.key)) e.preventDefault();
+  }}
               placeholder="Price"
               value={formData.price}
               onChange={handlePriceChange}
@@ -396,7 +402,10 @@ const Billing = () => {
 
       {productList.length > 0 && (
         <div className="table-container">
-          <h4>Current Bill Items</h4>
+          <h4 style={{ color: '#1976d2', fontWeight: '600', fontSize: '20px', marginBottom: '10px' }}>
+  Current Bill Items
+</h4>
+
           <table className="table-1">
             <thead>
               <tr>
@@ -421,7 +430,10 @@ const Billing = () => {
       )}
 
       <div className="table-container relative" ref={tableRef}>
-        <h4>Billing History</h4>
+        <h4 style={{ color: '#1976d2', fontWeight: '600', fontSize: '20px', marginBottom: '10px' }}>
+  Billing History
+</h4>
+
         <table className="table-1">
           <thead>
             <tr>

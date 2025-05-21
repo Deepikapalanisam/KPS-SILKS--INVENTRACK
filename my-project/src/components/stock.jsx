@@ -37,7 +37,7 @@ const Stock = () => {
 
   const filteredStocks = stocks.filter(stock =>
     stock.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-    (category ? stock.category.toLowerCase() === category.toLowerCase() : true) &&
+    (category ? stock.category.toLowerCase().includes(category.toLowerCase()) : true) &&
     (supplier ? stock.supplier.toLowerCase().includes(supplier.toLowerCase()) : true)
   );
 
@@ -106,4 +106,4 @@ const Stock = () => {
   );
 };
 
-export default Stock; 
+export default Stock;

@@ -142,27 +142,34 @@ function Purchase() {
           </div>
 
           <div className="input-group">
-            <input
-              type="number"
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-              placeholder="Enter quantity"
-              required
-              min="1"
-              step="1"
-            />
+<input
+  type="number"
+  value={quantity}
+  onChange={(e) => setQuantity(e.target.value)}
+  onKeyDown={(e) => {
+    if (["e", "E", "+", "-"].includes(e.key)) e.preventDefault();
+  }}
+  placeholder="Enter quantity"
+  required
+  min="1"
+  step="1"
+/>
           </div>
 
           <div className="input-group">
-            <input
-              type="number"
-              value={pricePerUnit}
-              onChange={(e) => setPricePerUnit(e.target.value)}
-              placeholder="Enter price"
-              required
-              min="0.01"
-              step="0.01"
-            />
+
+<input
+  type="number"
+  value={pricePerUnit}
+  onChange={(e) => setPricePerUnit(e.target.value)}
+  onKeyDown={(e) => {
+    if (["e", "E", "+", "-"].includes(e.key)) e.preventDefault();
+  }}
+  placeholder="Enter price"
+  required
+  min="0.01"
+  step="0.01"
+/>
           </div>
 
           <div className="input-group">

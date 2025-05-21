@@ -36,9 +36,10 @@ function Admin() {
   return (
     <div className="flex min-h-screen font-poppins bg-[#f4f6f8]">
       {/* Sidebar */}
-      <aside className="w-64 bg-[#0a2c66] text-white fixed top-0 left-0 bottom-0 p-6 z-10 shadow-lg">
-        <h2 className="text-3xl font-bold text-center mb-12 tracking-wide leading-tight">
-          KPS SILKS<br />
+      <aside className="w-64 bg-[#1976d2] text-white fixed top-0 left-0 bottom-0 p-6 z-10 shadow-lg">
+        <h2 className="text-3xl font-bold text-center mb-12 tracking-wide">
+          KPS SILKS
+          <br />
           <span className="text-lg font-light">Admin</span>
         </h2>
 
@@ -52,10 +53,14 @@ function Admin() {
                     to={path}
                     onClick={() => setActiveLink(path)}
                     className={`flex items-center gap-4 px-5 py-3 rounded-lg transition-all duration-300 shadow-sm 
-                      ${isActive ? "bg-white text-[#0a2c66]" : "bg-[#1976d2] text-white"} 
-                      hover:bg-white hover:text-[#0a2c66]"`}
+                      ${isActive ? "bg-white text-[#1976d2]" : "bg-[#2196f3] text-white"} 
+                      hover:bg-white hover:text-[#1976d2]`}
                   >
-                    <span className={`material-symbols-outlined text-xl ${isActive ? "text-[#0a2c66]" : "text-white"}`}>
+                    <span
+                      className={`material-symbols-outlined text-xl ${
+                        isActive ? "text-[#1976d2]" : "text-white"
+                      }`}
+                    >
                       {icon}
                     </span>
                     {label}
@@ -68,9 +73,9 @@ function Admin() {
 
         <button
           onClick={handleLogout}
-          className="flex items-center gap-4 px-5 py-3 mt-8 w-full rounded-lg bg-[#e53935] hover:bg-[#c62828] text-white transition-all duration-300 shadow-sm"
+          className="flex items-center gap-4 px-5 py-3 mt-8 w-full rounded-lg bg-[#f44336] hover:bg-[#d32f2f] text-white transition-all duration-300 shadow-sm"
         >
-          <span className="material-symbols-outlined text-xl">logout</span>
+          <span className="material-symbols-outlined text-xl">exit_to_app</span>
           Logout
         </button>
       </aside>
